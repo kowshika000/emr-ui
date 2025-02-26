@@ -1,0 +1,234 @@
+.p1{
+    margin-top: 10px;
+    font-weight: 500;
+    margin-bottom: 0px;
+    margin-left: 5px;
+}
+.inputsl{
+    margin-left: 50px !important;
+}
+.inputsl1{
+    margin-left: 60px !important;
+    width: 19% !important;
+
+}
+.inputsl2{
+    margin-left: 62px !important;
+    width: 91% !important;
+
+}
+.inputsl3{
+    margin-left: 90px;
+    width: 76% !important;
+
+}
+.inputsl4{
+    margin-left: 70px !important;
+    width: 19% !important;
+}
+.inputsl5{
+    
+    width: 78% !important;
+    
+
+
+}
+.inputsl6{
+    margin-left: 74px !important;
+    width:19% !important;
+
+}
+.inputsl7{
+    margin-left: 105px !important;
+    width:19% !important;
+
+}
+/* .card{
+    background-color:white;
+    display: flex;
+    justify-content: center;
+
+} */
+
+
+.content{
+    margin: 10px;
+}
+.card-details{
+    margin: 10px;
+    margin-bottom: 0px;
+}
+.card-details-content{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.search-bar{
+    width:60%;
+    margin: 5px;
+  
+}
+.MuiInputLabel-root{
+    color : #006d5b !important;
+}
+/* .MuiTableCell-head{
+    border-right: 1px solid white;
+    height: 60px;
+    
+} */
+.MuiInputBase-root{
+    margin-left: 5px;
+}
+
+.MuiInputBase-input {
+    
+    font-size: 15px !important;
+    margin-left: 10px !important;
+}
+.search-icon{
+    position: absolute;
+    margin-top: 7px;
+    margin-left: 5px;
+ color: rgb(216, 213, 213);
+    
+}
+.table-card-container{
+    margin-top: 15px !important;
+}
+.btn-groups{
+    margin-top: 30px;
+    display: flex;
+    justify-content:space-around;
+    margin-bottom: 20px;
+}
+.labelm{
+    font-size: 14px !important
+}
+.inputsm{
+  margin-left: 20px !important;
+}
+.inputsm1{
+  margin-left: 30px !important;
+
+}
+.inputsm2{
+  margin-left: 30px !important;
+  width: 89%;
+
+
+}
+.inputsm3{
+  margin-left: 55px !important;
+  width: 78%;
+
+}
+.labeld-c {
+    margin-left: 5px !important;
+    font-size: 14px !important
+
+}
+.labelm{
+    margin-left: 5px !important;
+    font-size: 14px !important
+}
+.inputsm4{
+  margin-left: 40px !important;
+  width: 61%;
+}
+.inputsm5{
+    margin-left: -15px !important;
+    width: 113%;
+}
+.inputsm6{
+  margin-left: 42px !important;
+  width: 61%;
+
+}
+.inputsm7{
+  margin-left: 69px !important;
+  width: 63%;
+
+
+}
+.inputsm8{
+    margin-left: 51px !important;
+  width: 61%;
+}
+.inputsm9{
+    margin-left: 38px !important;
+    width: 61%;
+}
+.dialog2-coloms{
+    width:70% !important
+}
+.approve-col1{
+    border-radius: 5px;
+ border: 1px solid black;
+    height: 200px;
+    background-color: rgb(224, 224, 224);
+
+} 
+.approve-col2{
+    
+ border: 1px solid black;
+   
+    border-radius: 5px;
+    height: 200px;
+    background-color: rgb(224, 224, 224);
+
+
+
+
+
+} 
+.remarks-input{
+  margin-top: 30px;
+
+
+}
+.btn-groups2{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-evenly;
+}
+.p2{
+    margin-top: 0px;
+    margin-left: -10px;
+    background-color: rgb(231, 227, 227);
+    border-radius: 5px;
+    margin-right: 5px !important;
+}
+.b1{
+    border: 1px solid;
+    border-radius: 4px;
+    gap: 2px;
+}
+.a1{
+    border: 1px solid;
+    border-radius: 4px;
+    gap: 2px;
+}
+@media (max-width:1024px){
+    
+}
+.input-rows{
+
+    display:flex;
+align-items: baseline;
+
+gap: 10px;
+
+}
+.input-rows1{
+
+    display:flex;
+align-items: baseline;
+margin-top: 20px;
+gap: 10px;
+
+}
+.search-bar{
+    margin-left: 5px !important;
+    width:40% !important;
+}

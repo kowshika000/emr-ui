@@ -1,0 +1,56 @@
+/* #filled-basic{
+    margin-top: -10px !important;
+
+}
+.MuiFormLabel-root{
+    margin-top: -10px !important;
+
+}
+#outlined-basic{
+height: 30px !important;
+} */
+ .ant-table-thead{
+    background-color: rgb(1, 143, 124) !important;
+ }
+ .header{
+    display:flex;
+    justify-content: space-between;
+ }
+ .Addnewuser-b{
+    display: flex;
+    justify-content: end !important;
+
+ }
+ .Addnewuser-b1{
+   display: flex;
+   justify-content: flex-end;
+ }
+ .ant-table-thead.ant-table-cell{
+   background-color: rgb(0, 128, 128) !important;
+ }
+ 
+.MuiFormControl-root{
+   /* padding-right: 50px !important; */
+   
+  
+ }
+
+ 
+ #org-input{
+   margin-left: 0px !important;
+   /* padding-top: 10px !important; */ 
+ }
+
+ .Addnewuser-b{
+
+ }
+ .uploads-buttons{
+  display:flex;
+  justify-content:space-around
+ }
+ .uploads-buttons1{
+  display:flex;
+  justify-content:space-around
+
+
+ }

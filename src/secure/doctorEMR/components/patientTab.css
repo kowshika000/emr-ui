@@ -1,0 +1,46 @@
+.container {
+    width: 100%;
+    padding: 0 15px;
+    margin: 0 auto;
+}
+
+.nav-underline {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.nav-link {
+    cursor: pointer;
+    padding: 10px;
+    color: #007bff;
+}
+
+.nav-link.active {
+    border-bottom: 2px solid #007bff;
+}
+
+.form-control {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.tab-content {
+    width: 100%;
+    padding: 10px 15px;
+}
+
+.box-wrapper {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.box-wrapper .tab-content {
+    border-top: 1px solid #dee2e6;
+    padding-top: 20px;
+}
+
+.btn {
+    margin-top: 10px;
+}

@@ -1,0 +1,43 @@
+.emr-required {
+  color: red;
+}
+
+.field-label {
+  font-weight: 500;
+}
+
+.emr-input {
+  border-color: rgb(225, 228, 228);
+  border-radius: 5px;
+  border-width: 1px;
+  line-height: 1.5em;
+  padding: 0.2em;
+  border-style: solid;
+  min-width: 200px;
+  min-height: 35px;
+}
+
+.input-error {
+  border-color: red;
+}
+
+.header {
+  font-weight: 600;
+  font-size: 1.2em;
+}
+
+/* .stsearch-box input {
+  border: none !important;
+  padding: 0 !important;
+}
+.stsearch-box input:focus-within {
+  border: none !important;
+}
+.stsearch-box {
+  padding: 3px !important;
+}
+
+.stdropdown-container {
+  background-color: #fcfcfc !important;
+  border: 2px solid rgb(118, 165, 165) !important;
+} */

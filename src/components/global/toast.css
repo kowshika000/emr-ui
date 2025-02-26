@@ -1,0 +1,39 @@
+.toast-success {
+  background-color: #dff0d8 !important; /* Green */
+  color: #4c4f4a;
+  padding: 0.5em;
+  cursor: pointer;
+  border-radius: 0.5em;
+  /* margin-bottom: 1em; */
+}
+
+.toast-error {
+  display: flex;
+  background-color: #ffd3d3;
+  color: #c30000 !important;
+  padding: 0.5em;
+  cursor: pointer;
+  border-radius: 0.5em;
+  /* margin-bottom: 1em; */
+}
+
+.toast-warning {
+  background-color: #ff9800; /* Orange */
+  color: white;
+  padding: 0.5em;
+  cursor: pointer;
+  border-radius: 0.5em;
+  /* margin-bottom: 1em; */
+}
+
+.toast-info {
+  background-color: #2196f3; /* Blue */
+  color: white;
+  padding: 0.5em;
+  cursor: pointer;
+  border-radius: 0.5em;
+  /* margin-bottom: 1em; */
+}
+.Toastify__toast-container {
+  padding: 0;
+}

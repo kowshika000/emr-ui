@@ -1,0 +1,40 @@
+
+.po-inputs1{
+
+ display: flex;
+     align-items: baseline;
+     gap: 10px;
+}
+.table-container-details{
+  
+    margin-right: 50px;
+    margin-top: 30px;
+}
+.MuiTableCell-head{
+    background-color: #006d5b !important; 
+    color: white;
+  }
+
+  
+  .po-inputs label {
+    font-size: 12px; 
+  
+  }
+  #demo-select-small-label{
+    font-size: 12px; 
+
+  }
+.pro-buttons{
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 50px;
+    gap: 10px;
+    margin-top: 10px;
+}
+.pro-buttons1{
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-around;
+
+
+}
