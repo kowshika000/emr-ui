@@ -1,0 +1,47 @@
+/* *{
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+} */
+.main{
+    width: 100%;
+    padding: 20px;
+}
+.link{
+    text-decoration: none;
+}
+.container{
+    display: flex;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+
+ 
+  
+}
+
+ 
+
+.item-text{
+    color: white;
+    padding: 7px;
+   
+}
+/* .a{
+    padding: 10px !important;
+} */
+ .MuiBox-root{
+    gap:30px !important
+ }
+ .active:hover{
+    color: grey;
+ }
+ @media (max-width:768px){
+    .MuiBox-root{
+        gap:20px !important
+     }
+     .active{
+        font-size: 15px;
+     }
+}

@@ -1,0 +1,60 @@
+/* Extend Bootstrap's accordion-button styles with your custom class */
+.accordion-arrow-button {
+    background-color: transparent;
+    /* Optional: remove background */
+    border: none;
+    /* Optional: remove border */
+    box-shadow: none;
+    /* Optional: remove box-shadow */
+    padding: 0;
+    /* Optional: reduce padding */
+    width: 40px;
+    /* Set the button width */
+    height: 40px;
+    /* Set the button height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Customizing only the arrow for accordion-arrow-button */
+.accordion-arrow-button::after {
+    content: "▼";
+    /* Default down arrow */
+    font-size: 1.5rem;
+    /* Adjust arrow size */
+    color: black;
+    /* Arrow color */
+    transition: transform 0.3s ease;
+    /* Smooth transition */
+}
+
+/* Change the arrow direction when accordion is open */
+.accordion-arrow-button[aria-expanded="true"]::after {
+    content: "▲";
+    /* Change to up arrow when expanded */
+    transform: rotate(180deg);
+    /* Rotate smoothly */
+}
+
+/* Optional hover state for the arrow button */
+.accordion-arrow-button:hover::after {
+    color: blue;
+    /* Change arrow color on hover */
+}
+
+/* Optionally align with the rest of the accordion header */
+.accordion-arrow-button {
+    margin-right: 10px;
+    /* Adjust spacing */
+}
+
+
+.nav-link {
+    text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    text-decoration: underline;
+}

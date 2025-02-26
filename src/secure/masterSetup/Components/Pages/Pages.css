@@ -1,0 +1,231 @@
+
+
+.TableContainer{
+    margin-top: 5%;
+}
+.tableHead{
+    background-color: rgb(30, 145, 190);
+    color:White
+}
+.css-1ais0ar-MuiTableCell-root{
+    color: white !important;
+    font-weight: 500 !important;
+}
+.label-input{
+    height : 35px !important;
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+
+}
+.MuiTabs-flexContainer.MuiTabs-centered.css-stp9o6-MuiTabs-flexContainer{
+    justify-content: flex-start !important;
+}
+.buttons{
+    margin-top: 4px;
+    background-color :  rgb(30, 145, 190);
+     color: white ;
+     border-radius: 5px;
+   margin-left: 5px;
+   border-color:   rgb(30, 145, 190);
+   text-decoration: none;
+}
+.card{
+    background-color: rgb(245, 245, 245);
+    margin-top: 5px;
+}
+.MuiInputBase-root{
+    height:28px !important;
+}
+.MuiFilledInput-root{
+    background-color: white !important;
+    border: 1px solid rgb(182, 181, 181);
+    height: 35px !important;
+    margin-left: 6px !important;
+}
+
+.css-1pht7va-MuiInputBase-root-MuiFilledInput-root::after{
+    border-bottom: 1px Solid #006d5b !important; 
+
+}
+.css-1pht7va-MuiInputBase-root-MuiFilledInput-root{
+    border-bottom: 1px Solid #006d5b !important; 
+}
+.css-j218zi-MuiInputBase-root-MuiInput-root-MuiSelect-root::before{
+    border-bottom: 1px Solid #006d5b !important; 
+}
+.css-j218zi-MuiInputBase-root-MuiInput-root-MuiSelect-root::after{
+    border-bottom: 1px Solid #006d5b !important; 
+}
+.MuiFormLabel-root{
+ font-size: 14px !important;
+
+}
+.radio-label{
+    font-size: 15px !important;
+}
+
+
+.table-card-container{
+    margin-top: 0px;
+}
+.p{
+    background-color: rgb(207, 207, 207);
+    margin-bottom : 0px;
+    padding-left: 5px;
+    font-weight: 500;
+}
+.MuiPaper-root {
+    margin-top: 0px;
+}
+.card{
+    margin-top: 5px;
+   
+}
+.p-dialog-header{
+    padding: 0px;
+}
+.inputs1{
+
+    width: 41% !important;
+    
+}
+.inputs2{
+    margin-right: 10px !important;
+    width: 41% !important;
+    
+}
+.inputs3{
+
+    width: 30% !important;
+    margin-left: -50px;
+
+    
+}.inputs4{
+
+    width: 30% !important;
+    margin-left: 60px !important;
+    
+}
+.input-text{
+    width: 41%;
+    margin-left: 20px !important;
+}
+.labels{
+    margin-right: 70px;
+}
+.labels2{
+    margin-left: 29px;
+}
+
+.labelpro{
+    margin-right: 2px;
+}
+.card-details{
+    margin: 5px;
+    
+}
+.lablestock{
+    margin-right: 6px; 
+}
+.radio-list{
+    margin-top: 15px !important;
+}
+.form-check-input{
+    margin-left: 5px !important;
+}
+
+@media (max-width:1024px){
+    
+.input-text{
+    width: 41%;
+}
+.inputs3{
+
+    width: 40% !important;
+    margin-left: -50px;
+
+    
+}.inputs4{
+
+    width: 40% !important;   
+}
+.labels{
+    margin-right: 70px;
+}
+.labels2{
+    margin-right: 0px;
+}
+.g-1{
+    display: flex;
+    margin-left: 100px;
+}
+
+/* changing Desing */
+ #filled-basic{
+    width:180px !important;
+}
+/* .MuiInputBase-root{
+    width:180px !important
+}
+.label-input{
+    width: 180px;
+}  */
+
+
+#label-input-Supplier{
+    width:220px
+}
+#label-input-Product{
+    margin-left:-33%;
+}
+
+
+}
+@media (max-width:768px){
+    .MuiInputBase-root.MuiInput-root{
+        margin-left: -1px;
+    width: 217px;
+    }
+   
+    .label-inputs {
+        margin-left: -10px;
+    }
+}
+
+
+
+
+
+.Gs-inputs.MuiInputBase-input{
+    margin-top: -20px !important;
+}
+.MuiTableHead-root.tableHead{
+    height:60px;
+
+  
+}
+.MuiTableCell-head{
+    border-right: 1px solid white;
+    background-color: teal;
+    font-weight: 700;
+}
+.dropdown{
+    display:flex;
+    justify-content: end;
+    margin-top: -80px;
+  
+}
+.dropdown-content {
+    border-radius:10px;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+}
+.bar-icon{
+width:20% !important;
+
+}

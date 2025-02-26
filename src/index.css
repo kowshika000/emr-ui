@@ -1,0 +1,128 @@
+html,
+body {
+  font-size: 14px !important;
+  font-family: system-ui !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#root,
+.app,
+.content {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.app {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #c8cdce; /* Color of the scrollbar thumb */
+  border-radius: 5px; /* Round the corners of the thumb */
+  border: 2px solid transparent; /* Adds space between thumb and track */
+  background-clip: content-box; /* Ensures the thumb color stays within bounds */
+}
+
+thead tr:nth-child(odd) {
+  background-color: rgb(155, 211, 211) !important;
+  color: #ffffff !important;
+}
+
+thead tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+thead {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1 !important;
+}
+
+thead th {
+  text-align: center !important;
+}
+
+tbody td {
+  text-align: center !important;
+}
+
+/* thead tr th {
+  color: #fff !important;
+} */
+
+tbody tr:nth-child(odd) {
+  background-color: #edeeee;
+}
+
+th {
+  font-weight: 600 !important;
+}
+
+td,
+th {
+  font-size: 13px !important;
+  padding: 1em !important;
+}
+
+td {
+  padding: 0.5em 1em !important;
+}
+
+.filter-input input {
+  padding: 0.5em;
+  width: 100px;
+}
+
+#status-select {
+  padding: 0.5em 2em !important;
+}
+.css-elo8k2-MuiInputAdornment-root {
+  margin-left: 0 !important;
+}
+.text-dark {
+  font-size: 16px;
+  font-weight: 500;
+}
+/* input[type="time"],
+input[type="date"],
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+select,
+textarea {
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc !important;
+} */
+
+
+/* .ant-table-thead .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: white !important;
+  border-color: rgb(150, 209, 209) !important;
+}
+.ant-table-thead .ant-checkbox-checked .ant-checkbox-inner::after {
+  border-color: rgb(150, 209, 209) !important;
+}
+.ant-table-tbody .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: rgb(150, 209, 209) !important;
+  border-color: rgb(150, 209, 209) !important;
+}
+.ant-checkbox:hover .ant-checkbox-inner {
+  border-color: rgb(150, 209, 209) !important;
+}
+.ant-table-tbody .ant-checkbox-inner {
+  border-color: rgb(150, 209, 209) !important;
+}
+.ant-checkbox-indeterminate .ant-checkbox-inner:after {
+  background-color: rgb(150, 209, 209) !important;
+} */
