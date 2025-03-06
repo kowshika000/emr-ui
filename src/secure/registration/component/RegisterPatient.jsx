@@ -9,13 +9,18 @@ import { registerPatients } from "../../../Redux/slice/registration/registerPati
 import { useSelector } from "react-redux";
 import { showToast } from "../../../components/global/Toast";
 import { Link, useLocation } from "react-router-dom";
-import PatientInfo from "./PatientInfo";
+import { PatientInfo } from "./PatientInfo/PatientInfo";
 
 const RegisterPatient = () => {
   const OPTION = DropdownOptions;
   const dispatch = useDispatch();
   const location = useLocation();
   const bookedDetails = location.state?.bookedDetails;
+  const surgeryPatientData = location.state?.patientData;
+  const schedulePatientData = location.state?.rowData;
+
+  console.log("schedulePatientData", schedulePatientData);
+
   const [showPatientInfo, setShowPatientInfo] = useState(false);
   const [patientData, setPatientData] = useState();
 
@@ -26,19 +31,27 @@ const RegisterPatient = () => {
 
   const [formData, setFormData] = useState({
     image: "",
-    visitType: "",
-    patientName: bookedDetails ? bookedDetails.patientName : "",
+    visitType: surgeryPatientData ? "In Patient" : "" || "",
+    patientName:
+      bookedDetails?.patientName ||
+      surgeryPatientData?.patient ||
+      schedulePatientData?.patientName ||
+      "",
     gender: "",
     dob: "",
     nationality: "",
     visaType: "",
-    phoneNumber: bookedDetails ? bookedDetails.phoneNo : "",
+    phoneNumber:
+      bookedDetails?.phoneNo ||
+      surgeryPatientData?.mobile ||
+      schedulePatientData?.mobile ||
+      "",
     infoSource: "",
     address: "",
     referralCase: "",
     regDate: getCurrentDate(),
     age: "",
-    email: bookedDetails ? bookedDetails.emailId : "",
+    email: bookedDetails?.emailId || schedulePatientData?.emailId || "",
     nationalId: "",
     workPhoneNumber: "",
     language: "",
@@ -54,7 +67,8 @@ const RegisterPatient = () => {
     patientRemarks: "",
     speciality: "",
     encounterType: "",
-    doctorName: "",
+    doctorName:
+      surgeryPatientData?.doctor || schedulePatientData?.doctorName || "",
     paymentType: "",
     subInsurance: "",
     networkType: "",
@@ -71,10 +85,10 @@ const RegisterPatient = () => {
     copayPatient: "",
     admissionDate: "",
     admissionTime: "",
-    expectedDischargeDate: "",
+    expectedDischargeDate: surgeryPatientData?.exp_discharge_date || "",
     expectedDischargeTime: "",
     admissionNote: "",
-    ward: "",
+    ward: surgeryPatientData?.ward || "",
     roomNo: "",
     bedNo: "",
     bedRate: "",
@@ -111,41 +125,99 @@ const RegisterPatient = () => {
       "paymentType",
       "encounterType",
     ];
-    const missingFields = requiredFields.filter((field) => !formData[field]);
-    if (missingFields.length > 0) {
-      showToast(
-        <div>
-          <p>Please fill all required fields:</p>
-          <ul>
-            {missingFields.map((field, index) => (
-              <li key={index}>{field}</li>
-            ))}
-          </ul>
-        </div>,
-        "error"
-      );
-      return;
-    }
+    // const missingFields = requiredFields.filter((field) => !formData[field]);
+    // if (missingFields.length > 0) {
+    //   showToast(
+    //     <div>
+    //       <p>Please fill all required fields:</p>
+    //       <ul>
+    //         {missingFields.map((field, index) => (
+    //           <li key={index}>{field}</li>
+    //         ))}
+    //       </ul>
+    //     </div>,
+    //     "error"
+    //   );
+    //   return;
+    // }
     dispatch(registerPatients(formData));
+    setFormData((prev) => ({
+      ...prev,
+      image: "",
+      visitType: "",
+      patientName: "",
+      gender: "",
+      dob: "",
+      nationality: "",
+      visaType: "",
+      phoneNumber: "",
+      infoSource: "",
+      address: "",
+      referralCase: "",
+      regDate: getCurrentDate(),
+      age: "",
+      email: "",
+      nationalId: "",
+      workPhoneNumber: "",
+      language: "",
+      religion: "",
+      referredBy: "",
+      patientType: "",
+      patientPriority: "",
+      maritalStatus: "",
+      otherId: "",
+      landPhone: "",
+      occupation: "",
+      place: "",
+      patientRemarks: "",
+      speciality: "",
+      encounterType: "",
+      doctorName: "",
+      paymentType: "",
+      subInsurance: "",
+      networkType: "",
+      insuranceCardNo: "",
+      insuranceEffectiveFrom: "",
+      certificateNumber: "",
+      maxInsuranceLiability: "",
+      maxInsuranceCopay: "",
+      extraCardNumber: "",
+      insuranceExpireDate: "",
+      dependentsNo: "",
+      insuranceClaimNumber: "",
+      insuranceApprovalLimit: "",
+      copayPatient: "",
+      admissionDate: "",
+      admissionTime: "",
+      expectedDischargeDate: "",
+      expectedDischargeTime: "",
+      admissionNote: "",
+      ward: "",
+      roomNo: "",
+      bedNo: "",
+      bedRate: "",
+      accomodationNote: "",
+    }));
   };
 
   useEffect(() => {
     if (registerPatientData?.statusCode === 200) {
       setShowPatientInfo(true);
       setPatientData(registerPatientData?.data);
-    } else if (error) {
-      showToast(registerPatientData?.message, "error");
+    } else if (registerPatientData?.statusCode === 500) {
+      showToast("Something went wrong!!", "error");
     }
   }, [registerPatientData, error]);
 
   return (
     <Box paddingBottom={"20%"}>
       {showPatientInfo ? (
-        <PatientInfo patientData={patientData} setShowPatientInfo={setShowPatientInfo} />
+        <PatientInfo
+          patientData={patientData}
+          setShowPatientInfo={setShowPatientInfo}
+        />
       ) : (
-        <form
-        // onSubmit={registerPatient}
-        >
+        <form>
           <Box p={1} width={"100%"}>
             <div>
               <p className="text-dark header">Patient Demographic Details</p>

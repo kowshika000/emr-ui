@@ -12,7 +12,7 @@ import PatientVaccinationSchedule from "../dashboard/components/PatientVaccinati
 import VaccinesIcon from "@mui/icons-material/Vaccines";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import EventRepeatIcon from "@mui/icons-material/EventRepeat";
-import PatientList from "./component/PatientList";
+import PatientList from "./component/PatientInfo/PatientList";
 
 const Registration = () => {
   const [searchParams] = useSearchParams();

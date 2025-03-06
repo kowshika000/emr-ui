@@ -4,18 +4,19 @@ import { API_ENDPOINTS } from "../../api/apiEndpoints";
 
 export const revisitPatients = createAsyncThunk(
   "patient/revisitPatients",
-  async (credentials, { rejectWithValue }) => {
+  async ({ credentials, patientId }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.put(
-        API_ENDPOINTS.REVISIT_PATIENT,
+        `${API_ENDPOINTS.REVISIT_PATIENT}/${patientId}`,
         credentials
       );
-      return response;
+      return response.data; 
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message);
+      return rejectWithValue(error.response?.data?.message || "Something went wrong!");
     }
   }
 );
+
 
 const revisitPatientsSlice = createSlice({
   name: "revisitPatients",

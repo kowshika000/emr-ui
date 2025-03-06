@@ -18,20 +18,24 @@ import { useDispatch } from "react-redux";
 import { cancelSchedule } from "../../../../Redux/slice/appointement/cancelScheduleSlice";
 import { useSelector } from "react-redux";
 import { showToast } from "../../../../components/global/Toast";
-// import { useLoading } from "../../hooks/useLoading";
-// import EMRLoader from "../../components/global/EMRLoader";
-// import { postData } from "../../utils/api";
-// import { showToast } from "../../utils/toast";
 
-const CancelAlertModal = ({ handleClose, events }) => {
+const CancelAlertModal = ({
+  handleClose,
+  appointmentId,
+  getAvailableSlotsForAllDoctors,
+}) => {
   const { loading, setLoading } = useLoading();
   const [displayReasonInput, setDisplayReasonInput] = useState(false);
   const [reason, setReason] = useState("");
   const dispatch = useDispatch();
 
+  const loginUser = JSON.parse(localStorage.getItem("user"));
+
   const { data } = useSelector((state) => state.cancel);
 
   const status = data.statusCode;
+
+  console.log(appointmentId, "events");
 
   const onReasonSelect = (e) => {
     const selectedValue = e.target.value;
@@ -43,38 +47,32 @@ const CancelAlertModal = ({ handleClose, events }) => {
     setReason(e.target.value);
   };
 
-  // const cancel = () => {
-  //   setLoading(true);
-  //   const payload = {
-  //     appointmentId: event?.eventId,
-  //     cancellationReason: reason,
-  //     cancelledBy: "Aravindh",
-  //   };
+  const handleCancel = async () => {
+    if (!reason) {
+      showToast(["Please select a reason for cancellation"], "warning");
+      return;
+    }
 
-  //   postData(`/app/doctorappointment/cancelAppointment`, payload)
-  //     .then((response) => {
-  //       showToast([response.message], "success");
-  //       event?.callback && event?.callback();
-  //       handleClose();
-  //     })
-  //     .catch((error) => {
-  //       setLoading(false);
-  //       console.log(error);
-  //     });
-  // };
-  const handleCancel = () => {
-    dispatch(
-      cancelSchedule({
-        appointmentId: events?.eventId,
-        cancellationReason: reason,
-        cancelledBy: "Aravindh",
-      })
-    );
-    handleClose();
-    if (status === null) {
-      showToast(["Something went wrong"], "error");
+    setLoading(true);
+
+    try {
+      const resultAction = await dispatch(
+        cancelSchedule({
+          appointmentId: appointmentId,
+          cancellationReason: reason,
+          cancelledBy: loginUser?.data?.userName,
+        })
+      ).unwrap(); // Ensures we wait for the action to complete
+
+      await getAvailableSlotsForAllDoctors(); // ✅ Refresh slots after rescheduling
+
+      showToast(["Appointment Cancelled successfully"], "success");
+      handleClose();
+    } catch (error) {
+      showToast([error || "Something went wrong"], "error");
     }
   };
+
   return (
     <Dialog open={true} onClose={handleClose} fullWidth maxWidth="sm">
       <EMRLoader show={loading} />
@@ -85,13 +83,13 @@ const CancelAlertModal = ({ handleClose, events }) => {
           Are you sure you want to cancel this appointment?
         </Box>
 
-        <FormControl fullWidth margin="normal">
+        <FormControl fullWidth margin="normal" size="small">
           <InputLabel>Reason For Cancellation</InputLabel>
           <Select
             value={reason}
             onChange={onReasonSelect}
             label="Reason For Cancellation"
-            size="small"
+            // size="small"
           >
             <MenuItem value="">Select...</MenuItem>
             {[

@@ -10,7 +10,7 @@ export const reSchedule = createAsyncThunk(
         API_ENDPOINTS.RE_SCHEDULE,
         credentials
       );
-      return response;
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }

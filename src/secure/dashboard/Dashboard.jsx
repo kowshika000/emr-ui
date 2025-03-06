@@ -24,7 +24,7 @@ const Dashboard = () => {
 
   return (
     <ScreenWrapper>
-      <Box m="20px">
+      <Box m="20px" overflow={"auto"}>
         <div className="text-dark">Employee Dashboard</div>
         <PageHeader
           // title={"Employee Dashboard"}

@@ -2,30 +2,33 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import SecureLayout from "./modules/secure/SecureLayout";
 import { useSelector } from "react-redux";
-import _ from "lodash";
 
 export const EMRRouteBuilder = (props) => {
   const [routes, setRoutes] = useState();
-  const navigate = useNavigate(); // React Router navigate function
-  const username = useSelector((state) => state?.auth?.user?.data?.userName); // Get username
-  const user = useSelector((state) => state?.auth?.user); // Get user for authentication
+  const navigate = useNavigate(); // React Router navigation function
+  const user = useSelector((state) => state?.auth?.user); // Get user from Redux state
 
-  // Check if the username is remembered in localStorage
-  const isRemembered = () => {
-    const rememberedUsername = localStorage.getItem("rememberedUsername");
-    return !_.isEmpty(rememberedUsername);
-  };
-
-  const isAuthenticated = () => {
-    return !!user; // Checks if the user exists in Redux state
+  // Check if user exists in localStorage
+  const isUserStored = () => {
+    return localStorage.getItem("user") !== null; // Returns true if "user" is in localStorage
   };
 
   useEffect(() => {
+    if (isUserStored()) {
+      navigate("/secure/landing", { replace: true }); // Redirect to landing if user exists
+    } else {
+      navigate("/login", { replace: true }); // Redirect to login if no user found
+    }
+  }, []); // Runs only on component mount
+
+  useEffect(() => {
     buildRoutes();
-  }, [user]); // Re-run route building when username changes
+  }, [user]); // Re-run route building when the user state changes
 
   const buildRoutes = () => {
-    const promiseRoutes = props.routes.map(async (route) => await buildRoute(route));
+    const promiseRoutes = props.routes.map(
+      async (route) => await buildRoute(route)
+    );
     Promise.all(promiseRoutes).then((routes) => {
       setRoutes(routes);
     });
@@ -34,26 +37,12 @@ export const EMRRouteBuilder = (props) => {
   async function buildRoute(route) {
     let Component = route.component;
 
-    // Interceptor logic
     if (props.interceptor) {
       Component = await props.interceptor(route);
     }
 
-    // Check if route is not secure and user is authenticated or remembered
-    if (!route.secure && (isAuthenticated() || isRemembered())) {
-      return (
-        <Route
-          key={route.path}
-          path={route.path}
-          exact={route.exact}
-          element={<Navigate to="/secure/landing" />} // Redirect if authenticated
-        />
-      );
-    }
-
-    // If route is secure and user is authenticated or remembered
-    else if (route.secure) {
-      if (isAuthenticated() || isRemembered()) {
+    if (route.secure) {
+      if (isUserStored()) {
         return (
           <Route
             key={route.path}
@@ -70,7 +59,7 @@ export const EMRRouteBuilder = (props) => {
         return (
           <Route
             key={route.path}
-            path={"login"}
+            path={route.path}
             exact={route.exact}
             element={<Navigate to="/login" />}
           />
@@ -78,20 +67,16 @@ export const EMRRouteBuilder = (props) => {
       }
     }
 
-    // If route is public
-    else {
-      return (
-        <Route
-          key={route.path}
-          path={route.path}
-          exact={route.exact}
-          element={<Component />}
-        />
-      );
-    }
+    return (
+      <Route
+        key={route.path}
+        path={route.path}
+        exact={route.exact}
+        element={<Component />}
+      />
+    );
   }
 
-  // Render all routes dynamically
   function renderRoutes() {
     return <Routes>{routes}</Routes>;
   }
