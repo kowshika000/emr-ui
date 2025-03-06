@@ -1,6 +1,5 @@
 import React, { Suspense } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import Dashboard from "../../../secure/dashboard/Dashboard";
 import Registration from "../../../secure/registration/Registration";
 import DoctorDashboard from "../../../secure/doctorNurseDashboard/doctorDashboard";
 import Privileges from "../../../secure/privileges/Privileges";
@@ -9,7 +8,6 @@ import Loading from "../../../components/FormFields/Loading";
 import AllAppointment from "../../../secure/appointment/AllAppointment";
 import Master from "../../../secure/masterSetup/master";
 import Landing from "../../../components/other/Landing";
-// import Home from "../../../secure/masterSetup/master/Home";
 
 const BillingLandingModule = React.lazy(() =>
   import("emr_billing/BillingLanding")
@@ -25,7 +23,9 @@ const WardRoomDetail = React.lazy(() =>
 const DoctorEmrModule = React.lazy(() => import("emr_doctor/DoctorEmr"));
 const IPDetails = React.lazy(() => import("emr_doctor/IPDetails"));
 const OPDetails = React.lazy(() => import("emr_doctor/OPDetails"));
-const LabMdl = React.lazy(() => import("emr_lab/LabHeaderTab"));
+// const LabMdl = React.lazy(() => import("emr_lab/LabHeaderTab"));
+const NurseModule = React.lazy(() => import("emr_nurse/Dashboard"));
+const NursePage = React.lazy(() => import("emr_nurse/Nurse"));
 
 const BillingLanding = () => {
   const navigate = useNavigate();
@@ -87,10 +87,26 @@ const OpDetailEmrMdl = () => {
   );
 };
 
-const LabModule = () => {
+// const LabModule = () => {
+//   return (
+//     <Suspense fallback={<Loading />}>
+//       <LabMdl />
+//     </Suspense>
+//   );
+// };
+
+const NurseMdl = () => {
+  const navigate = useNavigate();
   return (
     <Suspense fallback={<Loading />}>
-      <LabMdl />
+      <NurseModule navigate={navigate} />
+    </Suspense>
+  );
+};
+const NursePages = () => {
+  return (
+    <Suspense fallback={<Loading />}>
+      <NursePage />
     </Suspense>
   );
 };
@@ -174,11 +190,23 @@ export const SECURE_ROUTES = [
     secure: true,
     component: OpDetailEmrMdl,
   },
+  // {
+  //   path: `/secure/lab`,
+  //   exact: true,
+  //   secure: true,
+  //   component: LabModule,
+  // },
   {
-    path: `/secure/lab`,
+    path: `/secure/nurseEmr`,
     exact: true,
     secure: true,
-    component: LabModule,
+    component: NurseMdl,
+  },
+  {
+    path: `/secure/nurseEmr/:name`,
+    exact: true,
+    secure: true,
+    component: NursePages,
   },
   {
     path: `/secure/privileges`,

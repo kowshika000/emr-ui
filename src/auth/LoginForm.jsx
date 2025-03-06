@@ -8,6 +8,8 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { login } from "../Redux/slice/login/authSlice";
+import { useNavigate } from "react-router-dom";
+import { showToast } from "../components/global/Toast";
 
 const LoginForm = ({ setShowForgotPage, setShowLoginPage, setShowSignup }) => {
   const [formValues, setFormValues] = useState({
@@ -16,6 +18,7 @@ const LoginForm = ({ setShowForgotPage, setShowLoginPage, setShowSignup }) => {
   });
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
 
   const validateForm = () => {
@@ -34,8 +37,10 @@ const LoginForm = ({ setShowForgotPage, setShowLoginPage, setShowSignup }) => {
     const formErrors = validateForm();
     if (Object.keys(formErrors).length === 0) {
       dispatch(login(formValues));
+      navigate("/secure/landing");
     } else {
       setErrors(formErrors);
+      showToast("Someting went wrong !!");
     }
   };
 

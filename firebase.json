@@ -1,0 +1,17 @@
+{
+  "hosting": [
+    {
+      "target": "parent-app",
+      "public": "build",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        { "source": "/child-app1/**", "destination": "/child-app1/index.html" },
+        { "source": "/child-app2/**", "destination": "/child-app2/index.html" },
+        { "source": "/child-app3/**", "destination": "/child-app3/index.html" },
+        { "source": "/child-app4/**", "destination": "/child-app4/index.html" },
+        { "source": "/child-app5/**", "destination": "/child-app5/index.html" },
+        { "source": "/child-app6/**", "destination": "/child-app6/index.html" }
+      ]
+    }
+  ]
+}

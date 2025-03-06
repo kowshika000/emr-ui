@@ -186,7 +186,7 @@ const PatientVaccinationSchedule = () => {
   ];
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <Table
         dataSource={filteredData}
         columns={columns}

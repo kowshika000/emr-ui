@@ -41,7 +41,7 @@ const ScheduleList = () => {
   };
 
   const onCreatePatientVisit = () => {
-    navigate("/secure/registration");
+    navigate("/secure/registration", { state: {} });
   };
 
   const dropDownMenuItems = [
@@ -81,17 +81,7 @@ const ScheduleList = () => {
         />
       ),
     },
-    {
-      title: "National ID",
-      dataIndex: "nationalId",
-      key: "nationalId",
-      filterDropdown: () => (
-        <Input
-          placeholder="Search National ID"
-          onChange={(e) => handleFilterChange("nationalId", e.target.value)}
-        />
-      ),
-    },
+
     {
       title: "Mobile",
       dataIndex: "mobile",
@@ -122,17 +112,6 @@ const ScheduleList = () => {
         <Input
           placeholder="Search Doctor"
           onChange={(e) => handleFilterChange("doctorName", e.target.value)}
-        />
-      ),
-    },
-    {
-      title: "Remarks",
-      dataIndex: "remarks",
-      key: "remarks",
-      filterDropdown: () => (
-        <Input
-          placeholder="Search Remarks"
-          onChange={(e) => handleFilterChange("remarks", e.target.value)}
         />
       ),
     },
@@ -172,30 +151,12 @@ const ScheduleList = () => {
     <div>
       <EMRLoader show={loading} />
 
-      {/* Table */}
       <Table
         dataSource={appointments}
         columns={columns}
-        pagination={false}
         rowKey={(record) => record.id}
         className="table-container mt-3"
       />
-
-      {/* Pagination */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginTop: "16px",
-        }}
-      >
-        <Pagination
-          current={page}
-          total={appointments.length}
-          pageSize={rowsPerPage}
-          onChange={(newPage) => setPage(newPage)}
-        />
-      </div>
     </div>
   );
 };

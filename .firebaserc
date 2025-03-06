@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "emr-ui-parent-25225"
+  },
+  "targets": {
+    "emr-ui-parent-25225": {
+      "hosting": {
+        "parent-app": [
+          "emr-ui-parent-25225"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

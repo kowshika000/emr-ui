@@ -6,8 +6,11 @@ import { searchPatients } from "../../../Redux/slice/appointement/searchPatientS
 import FormInput from "../../../components/FormFields/FormInput";
 import { DropdownOptions } from "../../../components/FormFields/DropdownOptions";
 import { revisitPatients } from "../../../Redux/slice/registration/revisitSlice";
+import { useLocation } from "react-router-dom";
 
 const Revisit = () => {
+  const location = useLocation();
+  const surgeryPatientData = location.state?.patientData;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
 
@@ -15,6 +18,11 @@ const Revisit = () => {
 
   const dispatch = useDispatch();
   const { searchPatientData } = useSelector((state) => state.searchPatient);
+  const { revisitPatientData, loading } = useSelector((state) => state.revisit);
+
+  const patientId = selectedPatient?.patientId;
+
+  console.log(selectedPatient?.patientId);
 
   const handleSearchChange = (e) => {
     const inputValue = e.target.value;
@@ -27,18 +35,18 @@ const Revisit = () => {
   };
 
   const [formData, setFormData] = useState({
-    mrdNumber: "",
+    mrdNumber: surgeryPatientData?.mr_no || "",
     dob: "",
     gender: "",
-    mobileNumber: "",
-    patientName: "",
+    mobileNumber: surgeryPatientData?.mobile || "",
+    patientName: surgeryPatientData?.patient || "",
     age: "",
     nationality: "",
     nationalId: "",
     visaType: "",
     speciality: "",
     encounterType: "",
-    doctorName: "",
+    doctorName: surgeryPatientData?.doctor || "",
     paymentType: "",
     subInsurance: "",
     networkType: "",
@@ -49,7 +57,7 @@ const Revisit = () => {
     maxInsuranceCopay: "",
     extraCardNumber: "",
     insuranceExpireDate: "",
-    dependentsNo: "",
+    dependents: "",
     insuranceClaimNumber: "",
     insuranceApprovalLimit: "",
     copayPatient: "",
@@ -82,7 +90,36 @@ const Revisit = () => {
   };
 
   const revisitPatient = () => {
-    dispatch(revisitPatients(formData));
+    dispatch(revisitPatients({ credentials: formData, patientId }));
+    setFormData((prevData) => ({
+      ...prevData,
+      mrdNumber: "",
+      dob: "",
+      gender: "",
+      mobileNumber: "",
+      patientName: "",
+      age: "",
+      nationality: "",
+      nationalId: "",
+      visaType: "",
+      speciality: "",
+      encounterType: "",
+      doctorName: "",
+      paymentType: "",
+      subInsurance: "",
+      networkType: "",
+      insuranceCardNo: "",
+      insuranceEffectiveFrom: "",
+      certificateNumber: "",
+      maxInsuranceLiability: "",
+      maxInsuranceCopay: "",
+      extraCardNumber: "",
+      insuranceExpireDate: "",
+      dependents: "",
+      insuranceClaimNumber: "",
+      insuranceApprovalLimit: "",
+      copayPatient: "",
+    }));
   };
 
   return (
@@ -107,7 +144,7 @@ const Revisit = () => {
           onChange={handleOptionSelect}
         />
       </Box>
-      <Box >
+      <Box>
         <Box p={1} width={"100%"}>
           <div>
             <p className="text-dark header">Patient Demographic Details</p>
@@ -289,8 +326,8 @@ const Revisit = () => {
               />
               <FormInput
                 label={"Dependents No"}
-                value={formData.dependentsNo}
-                onChange={(value) => handleInputChange("dependentsNo", value)}
+                value={formData.dependents}
+                onChange={(value) => handleInputChange("dependents", value)}
               />
               <FormInput
                 label={"Insurance Claim No"}
@@ -322,7 +359,7 @@ const Revisit = () => {
         justifyContent={"flex-end"}
       >
         <Button onClick={revisitPatient} className="form-btn">
-          Register Revisit Patient
+          {loading ? "Registering..." : " Register Revisit Patient"}
         </Button>
       </Box>
     </Box>

@@ -25,11 +25,16 @@ import {
   FormControlLabel,
   Checkbox,
   Grid,
+  RadioGroup,
+  Radio,
+  FormControl,
+  FormLabel,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { searchPatients } from "../../../Redux/slice/appointement/searchPatientSlice";
 import { useSelector } from "react-redux";
 import { bookAppointment } from "../../../Redux/slice/appointement/bookAppointementSlice";
+import FormInput from "../../../components/FormFields/FormInput";
 
 const NewEventModal = ({
   open,
@@ -42,7 +47,6 @@ const NewEventModal = ({
   slotDuration,
   getAvailableSlotsForAllDoctors,
   getAllFacilitySchedules,
-  getAvailableSlotsForAllFacilities,
   addEventToState,
   slotInfo,
   selecteddoctorData,
@@ -53,13 +57,23 @@ const NewEventModal = ({
   const [eventData, setEventData] = useState(null);
   const { loading, setLoading } = useLoading();
 
-  const [inputValue, setInputValue] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState();
 
   const dispatch = useDispatch();
-  console.log("selectedData:", selecteddoctorData);
+  // console.log("selectedData:", selecteddoctorData);
   const { searchPatientData } = useSelector((state) => state?.searchPatient);
+
+  const handleSearchChange = (e) => {
+    const inputValue = e.target.value;
+    dispatch(searchPatients({ searchKey: inputValue }));
+    setSearchQuery(inputValue);
+  };
+
+  const handleOptionSelect = (event, value) => {
+    setSelectedPatient(value);
+  };
 
   const handleCreateEvent = async (e) => {
     if (!eventData) {
@@ -109,7 +123,7 @@ const NewEventModal = ({
 
       const newEvent = {
         id: `appointment_${Date.now()}`,
-        title: msg,
+        title: "",
         start: slotInfo.start,
         end: slotInfo.end,
         resourceId: slotInfo.resourceId,
@@ -136,30 +150,6 @@ const NewEventModal = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const searchPatient = _.debounce((e) => {
-    const key = e.target.value;
-
-    if (!key) return;
-    setLoading(true);
-
-    dispatch(searchPatients({ searchKey: key }))
-      .then(() => {
-        const suggestions = searchPatientData?.data || [];
-        setSuggestions(suggestions);
-      })
-      .catch((error) => {
-        console.error("Error fetching patient data:", error);
-        showToast(["Something Went Wrong!"], "error");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, 500);
-
-  const handleSelect = (event, newValue) => {
-    setSelectedPatient(newValue);
   };
 
   return (
@@ -199,33 +189,21 @@ const NewEventModal = ({
           <Box pb={4} pt={1}>
             <Autocomplete
               freeSolo
-              value={inputValue}
-              onInputChange={searchPatient}
-              options={suggestions}
-              onChange={handleSelect}
-              getOptionLabel={(option) =>
-                option
-                  ? `${option.name} - ${option.email ? option.email : ""}`
-                  : ""
-              }
+              options={searchPatientData?.data || []}
+              getOptionLabel={(option) => option.name || ""}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Search patients here..."
+                  label="Search Patients"
                   variant="outlined"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Type to search..."
                   size="small"
-                  fullWidth
-                  InputProps={{
-                    ...params.InputProps,
-                    // style: { padding: "0.3em" },
-                  }}
+                  sx={{ width: 300 }}
                 />
               )}
-              renderOption={(props, option) => (
-                <li {...props} style={{ cursor: "pointer" }}>
-                  {option.name} {option.email}
-                </li>
-              )}
+              onChange={handleOptionSelect}
             />
             <div style={{ fontSize: "0.7em" }}>
               For existing patients search patients with phone, name, dob, or
@@ -255,15 +233,7 @@ const NewEventModal = ({
   );
 };
 
-const AppointmentTabContent = ({
-  setEventData,
-  specialistList,
-  resourceId,
-  activeTab,
-  setLoading,
-  loading,
-  selectedPatient,
-}) => {
+const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
   const [formData, setFormData] = useState({
     scheduleType: "",
     numberOfSlots: 1,
@@ -279,7 +249,7 @@ const AppointmentTabContent = ({
     insurarName: "",
     notifyPatient: false,
   });
-
+  const [showNotify, setShowNotify] = useState(false);
   const ScheduleTypes = [
     { type: "Routine Check-Up", id: "1" },
     { type: "Consultation", id: "2" },
@@ -294,283 +264,246 @@ const AppointmentTabContent = ({
     setEventData(formData);
   }, [formData]);
 
-  const handleChange = (e, type = "input", parseToInt = false) => {
-    if (type === "checkbox") {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.checked.toString(),
-      });
-    } else {
-      const { name, value } = e.target;
-      setFormData({
-        ...formData,
-        [name]: parseToInt ? parseInt(value) : value,
-      });
-    }
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   useEffect(() => {
     if (selectedPatient) {
       let dob = selectedPatient.dob;
+      let patientName = selectedPatient.name;
       dob = dob ? dob.split("T")[0] : "";
-      setFormData({ ...formData, ...selectedPatient, dob });
+      setFormData({ ...formData, ...selectedPatient, dob, patientName });
     }
   }, [selectedPatient]);
 
   return (
-    <Box>
-      <form>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={3}>
-            <TextField
-              select
-              fullWidth
-              value={formData.scheduleType}
-              onChange={handleChange}
-              name="scheduleType"
-              variant="outlined"
-              size="small"
-              label={
-                <>
-                  Schedule Type <span style={{ color: "red" }}>*</span>
-                </>
-              }
+    <>
+      <Box
+        display="grid"
+        gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))"
+        gap={2}
+      >
+        <TextField
+          select
+          fullWidth
+          value={formData.scheduleType}
+          onChange={handleChange}
+          name="scheduleType"
+          variant="outlined"
+          size="small"
+          label={
+            <>
+              Schedule Type <span style={{ color: "red" }}>*</span>
+            </>
+          }
+        >
+          <MenuItem value={"-1"}>Select...</MenuItem>
+          {ScheduleTypes.map((type) => (
+            <MenuItem key={type.type} value={type.type}>
+              {type.type}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <TextField
+          select
+          fullWidth
+          value={formData.numberOfSlots}
+          onChange={(e) => handleChange(e, "input", true)}
+          name="numberOfSlots"
+          variant="outlined"
+          size="small"
+          label="No of Slots"
+        >
+          <MenuItem value={"-1"}>Select...</MenuItem>
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
+            <MenuItem key={count} value={count}>
+              {count}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <TextField
+          fullWidth
+          name="mrdNo"
+          value={formData.mrdNo}
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label="MRD No"
+        />
+
+        <TextField
+          fullWidth
+          name="patientName"
+          value={formData.patientName}
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label={
+            <>
+              Patient Name <span style={{ color: "red" }}>*</span>
+            </>
+          }
+        />
+
+        <TextField
+          fullWidth
+          name="dob"
+          value={formData.dob}
+          type="date"
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label={
+            <>
+              {" "}
+              Date of Birth <span style={{ color: "red" }}>*</span>
+            </>
+          }
+          InputLabelProps={{ shrink: true }}
+        />
+
+        <TextField
+          fullWidth
+          name="age"
+          value={formData.age}
+          type="number"
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label={
+            <>
+              {" "}
+              Age <span style={{ color: "red" }}>*</span>
+            </>
+          }
+        />
+
+        <TextField
+          fullWidth
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label={
+            <>
+              {" "}
+              Gender <span style={{ color: "red" }}>*</span>
+            </>
+          }
+        />
+
+        <TextField
+          fullWidth
+          name="phoneNo"
+          value={formData.phoneNo}
+          type="tel"
+          onChange={handleChange}
+          placeholder="Search or type..."
+          variant="outlined"
+          size="small"
+          label={
+            <>
+              {" "}
+              Mobile <span style={{ color: "red" }}>*</span>
+            </>
+          }
+          // InputProps={{
+          //   startAdornment: (
+          //     <InputAdornment position="start">+91</InputAdornment>
+          //   ),
+          // }}
+        />
+
+        <TextField
+          fullWidth
+          name="email"
+          value={formData.email}
+          type="email"
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label={
+            <>
+              {" "}
+              Email <span style={{ color: "red" }}>*</span>
+            </>
+          }
+        />
+
+        <TextField
+          fullWidth
+          label="Insurer Name"
+          name="insurarName"
+          value={formData.insurarName}
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+        />
+
+        <TextField
+          fullWidth
+          name="notes"
+          value={formData.notes}
+          multiline
+          // rows={3}
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label="Notes"
+        />
+
+        <TextField
+          fullWidth
+          name="additionalInfo"
+          value={formData.additionalInfo}
+          multiline
+          // rows={3}
+          onChange={handleChange}
+          variant="outlined"
+          size="small"
+          label="Additional Info"
+        />
+      </Box>
+      <Box display={"flex"} flexDirection={"column"}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showNotify}
+              onChange={(e) => setShowNotify(e.target.checked)}
+              name="showNotify"
+            />
+          }
+          label="Notify Patient"
+        />
+        {showNotify && (
+          <FormControl component="fieldset"  >
+            {/* <FormLabel component="legend">Notification Method</FormLabel> */}
+            <RadioGroup
+              name="notifyPatient"
+              value={formData.notifyPatient}
+              onChange={(e) => handleChange(e, "checkbox")}
+              row
             >
-              <MenuItem value={"-1"}>Select...</MenuItem>
-              {ScheduleTypes.map((type) => (
-                <MenuItem key={type.type} value={type.type}>
-                  {type.type}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
-          {/* {activeTab === "rooms" && (
-            <Grid item xs={12} md={3}>
-              <TextField
-                select
-                fullWidth
-                value={formData.doctorId}
-                onChange={handleChange}
-                name="doctorId"
-                variant="outlined"
-                size="small"
-                label={
-                  <>
-                    Specialist <span style={{ color: "red" }}>*</span>
-                  </>
-                }
-              >
-                <MenuItem value={"-1"}>Select...</MenuItem>
-                {specialistList.map((type) => (
-                  <MenuItem key={type.doctorId} value={type.doctorId}>
-                    {type.doctorName}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          )} */}
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              select
-              fullWidth
-              value={formData.numberOfSlots}
-              onChange={(e) => handleChange(e, "input", true)}
-              name="numberOfSlots"
-              variant="outlined"
-              size="small"
-              label="No of Slots"
-            >
-              <MenuItem value={"-1"}>Select...</MenuItem>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
-                <MenuItem key={count} value={count}>
-                  {count}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="mrdNo"
-              value={formData.mrdNo}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label="MRD No"
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="patientName"
-              value={formData.patientName}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label={
-                <>
-                  Patient Name <span style={{ color: "red" }}>*</span>
-                </>
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="dob"
-              value={formData.dob}
-              type="date"
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label={
-                <>
-                  {" "}
-                  Date of Birth <span style={{ color: "red" }}>*</span>
-                </>
-              }
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="age"
-              value={formData.age}
-              type="number"
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label={
-                <>
-                  {" "}
-                  Age <span style={{ color: "red" }}>*</span>
-                </>
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label={
-                <>
-                  {" "}
-                  Gender <span style={{ color: "red" }}>*</span>
-                </>
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="phoneNo"
-              value={formData.phoneNo}
-              type="tel"
-              onChange={handleChange}
-              placeholder="Search or type..."
-              variant="outlined"
-              size="small"
-              label={
-                <>
-                  {" "}
-                  Mobile <span style={{ color: "red" }}>*</span>
-                </>
-              }
-              // InputProps={{
-              //   startAdornment: (
-              //     <InputAdornment position="start">+91</InputAdornment>
-              //   ),
-              // }}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="email"
-              value={formData.email}
-              type="email"
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label={
-                <>
-                  {" "}
-                  Email <span style={{ color: "red" }}>*</span>
-                </>
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              label="Insurer Name"
-              name="insurarName"
-              value={formData.insurarName}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="notes"
-              value={formData.notes}
-              multiline
-              // rows={3}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label="Notes"
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              name="additionalInfo"
-              value={formData.additionalInfo}
-              multiline
-              // rows={3}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              label="Additional Info"
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.notifyPatient}
-                  onChange={(e) => handleChange(e, "checkbox")}
-                  name="notifyPatient"
-                />
-              }
-              label="Notify Patient"
-              // style={{ marginTop: 10 }}
-            />
-          </Grid>
-        </Grid>
-      </form>
-    </Box>
+              <FormControlLabel value="sms" control={<Radio />} label="SMS" />
+              <FormControlLabel
+                value="whatsapp"
+                control={<Radio />}
+                label="WhatsApp"
+              />
+              <FormControlLabel value="mail" control={<Radio />} label="Mail" />
+            </RadioGroup>
+          </FormControl>
+        )}
+      </Box>
+    </>
   );
 };
 

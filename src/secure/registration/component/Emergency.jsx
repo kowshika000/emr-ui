@@ -9,7 +9,13 @@ import { emergencyPatients } from "../../../Redux/slice/registration/emergencyPa
 const Emergency = () => {
   const dispatch = useDispatch();
   const OPTION = DropdownOptions;
-  const getCurrentDate = () => new Date().toISOString().split("T")[0];
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const currentDate = now.toISOString().split("T")[0];
+    const currentTime = now.toLocaleTimeString([], { hour12: false });
+    return `${currentDate} ${currentTime}`;
+  };
+
   const [formData, setFormData] = useState({
     visitType: "",
     mrdNumber: "",
@@ -17,14 +23,14 @@ const Emergency = () => {
     dob: "",
     nationality: "",
     visaType: "",
-    mobileNumber: "",
+    phoneNumber: "",
     infoSource: "",
-    regDate: getCurrentDate(),
+    regDate: getCurrentDateTime(),
     age: "",
     email: "",
     nationalId: "",
-    mobileNumberWork: "",
-    preferredLanguage: "",
+    workPhoneNo: "",
+    language: "",
     patientType: "",
     otherId: "",
     landPhone: "",
@@ -98,8 +104,8 @@ const Emergency = () => {
             />
             <FormInput
               label={"Phone Number (Mobile)"}
-              value={formData.mobileNumber}
-              onChange={(value) => handleInputChange("mobileNumber", value)}
+              value={formData.phoneNumber}
+              onChange={(value) => handleInputChange("phoneNumber", value)}
             />
             <FormInput
               label={"Info Source"}
@@ -134,14 +140,14 @@ const Emergency = () => {
             />
             <FormInput
               label={"Phone Number (Work)"}
-              value={formData.mobileNumberWork}
-              onChange={(value) => handleInputChange("mobileNumberWork", value)}
+              value={formData.workPhoneNo}
+              onChange={(value) => handleInputChange("workPhoneNo", value)}
             />
             <FormInput
               label={"Preferred Language"}
-              value={formData.preferredLanguage}
+              value={formData.language}
               onChange={(value) =>
-                handleInputChange("preferredLanguage", value)
+                handleInputChange("language", value)
               }
             />
             <FormInput
