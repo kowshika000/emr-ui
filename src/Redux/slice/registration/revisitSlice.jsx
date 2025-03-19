@@ -21,7 +21,7 @@ export const revisitPatients = createAsyncThunk(
 const revisitPatientsSlice = createSlice({
   name: "revisitPatients",
   initialState: {
-    revisitPatientData: [],
+    data: [],
     loading: false,
     error: null,
   },
@@ -34,7 +34,7 @@ const revisitPatientsSlice = createSlice({
       })
       .addCase(revisitPatients.fulfilled, (state, action) => {
         state.loading = false;
-        state.revisitPatientData = action.payload.data;
+        state.data = action.payload.data;
       })
       .addCase(revisitPatients.rejected, (state, action) => {
         state.loading = false;

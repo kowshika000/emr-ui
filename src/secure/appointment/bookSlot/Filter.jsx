@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Checkbox, FormControlLabel, Input, styled } from "@mui/material";
+import { Box, styled } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import moment from "moment";
 import CalendarView from "./CalendarView";
@@ -8,107 +8,57 @@ import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { DateCalendar } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import { allDoctors } from "../../../Redux/slice/appointement/allDoctorsSlice";
-import { searchDoctors } from "../../../Redux/slice/appointement/searchDoctorSilce";
 import EMRLoader from "../../../components/global/loader/EMRLoaderOverlay";
-import { debounce } from "lodash"; // Import debounce
-import FormInput from "../../../components/FormFields/FormInput";
 
 const Filter = () => {
   const dispatch = useDispatch();
   const [showFilter, setShowFilter] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState("users");
-  const [selectedDoctors, setSelectedDoctors] = useState({});
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpeciality, setSelectedSpeciality] = useState("");
+  const [branch, setBranch] = useState("");
+  const [branchId, setBranchId] = useState("");
 
   const { doctorData, docloading } = useSelector((state) => state?.allDoctor);
   const allDoctorData = doctorData?.data || [];
 
-  const { searchdoctorData, searchDocloading } = useSelector(
-    (state) => state?.searchDoctor
-  );
-  const searchDoctorResults = searchdoctorData?.data || [];
+  // const { searchdoctorData, searchDocloading } = useSelector(
+  //   (state) => state?.searchDoctor
+  // );
+  const { data } = useSelector((state) => state?.allBranch);
+  const branchData = data?.data;
+  console.log("branchData", branchData);
 
-  const loading = docloading || searchDocloading;
+  const loading = docloading;
 
   useEffect(() => {
     dispatch(allDoctors());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (allDoctorData?.length > 0) {
-      const initialSelection = allDoctorData.reduce((acc, doctor) => {
-        const doctorKey = `${doctor.doctorId}-${doctor.specialityId}`;
-        acc[doctorKey] = true;
-        return acc;
-      }, {});
-      setSelectedDoctors(initialSelection);
-    }
-  }, [allDoctorData]);
-
   const toggleFilter = () => setShowFilter(!showFilter);
-
-  const groupDoctorsBySpeciality = (doctors) => {
-    const grouped = {};
-    doctors.forEach((doctor) => {
-      if (!grouped[doctor.specialityId]) {
-        grouped[doctor.specialityId] = [];
-      }
-      if (
-        !grouped[doctor.specialityId].find(
-          (d) => d.doctorId === doctor.doctorId
-        )
-      ) {
-        grouped[doctor.specialityId].push(doctor);
-      }
-    });
-    return grouped;
-  };
-
-  const displayedDoctors = searchQuery ? searchDoctorResults : allDoctorData;
-  // const groupedDoctors = groupDoctorsBySpeciality(displayedDoctors);
-
-  // const handleDoctorSelect = (doctorId, specialityId) => {
-  //   setSelectedDoctors((prev) => {
-  //     const newSelection = { ...prev };
-  //     const doctorKey = `${doctorId}-${specialityId}`;
-
-  //     if (newSelection[doctorKey]) {
-  //       delete newSelection[doctorKey];
-  //     } else {
-  //       newSelection[doctorKey] = true;
-  //     }
-  //     return newSelection;
-  //   });
-  // };
 
   const handleSpecialityChange = (e) => {
     const selectedValue = e?.target?.value || "";
-    console.log("Selected Speciality ID:", selectedValue); // Debugging
     setSelectedSpeciality(selectedValue);
+  };
+
+  const handleBranchChange = (e) => {
+    const selectedValue = e?.target?.value || "";
+    setBranch(selectedValue);
+
+    // Find the branchId of the selected branch
+    const selectedBranch = branchData?.find(
+      (branch) => branch.branchName === selectedValue
+    );
+    setBranchId(selectedBranch?.branchName || "");
   };
 
   const filteredDoctors = selectedSpeciality
     ? allDoctorData.filter((doc) => doc.specialityId === selectedSpeciality)
     : [];
 
-  console.log("filteredDoctors", filteredDoctors);
-  // Debounced search function
-  // const debouncedSearch = debounce(async (input) => {
-  //   setSearchQuery(input);
-  //   if (activeTab === "users") {
-  //     await dispatch(searchDoctors({ searchKey: input }));
-  //   }
-  // }, 500); // Adjust the debounce delay as needed (500ms here)
-
-  // const handleSearch = (e) => {
-  //   const input = e.target.value;
-  //   debouncedSearch(input); // Call the debounced search function
-  // };
-
   return (
-    <Box display="flex"  width={"100%"}>
+    <Box display="flex" width={"100%"}>
       <EMRLoader show={loading} />
       <div>
         <div>
@@ -167,24 +117,42 @@ const Filter = () => {
             </Box>
 
             {activeTab === "users" && (
-              <Box display="flex" flexDirection="column" mt={1} >
-                <FormControl fullWidth size="small" >
+              <Box display="flex" flexDirection="column" gap={2} mt={1}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Select Branch</InputLabel>
+                  <Select
+                    value={branch}
+                    onChange={handleBranchChange}
+                    label="Select Branch"
+                  >
+                    <MenuItem value="">Select</MenuItem>
+                    {branchData?.map((data) => (
+                      <MenuItem key={data?.branchId} value={data?.branchName}>
+                        {data?.branchName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth size="small" disabled={!branchId}>
                   <InputLabel>Select Speciality</InputLabel>
                   <Select
                     value={selectedSpeciality}
                     onChange={handleSpecialityChange}
                     label="Select Speciality"
                   >
+                    <EMRLoader show={loading} />
                     <MenuItem value="">Select</MenuItem>
                     {Array.from(
                       new Map(
-                        allDoctorData.map((doc) => [
-                          doc.specialityId,
-                          {
-                            label: doc.specialityName || "Unknown",
-                            value: doc.specialityId,
-                          },
-                        ])
+                        allDoctorData
+                          .filter((doc) => doc.branchName === branchId)
+                          .map((doc) => [
+                            doc.specialityId,
+                            {
+                              label: doc.specialityName || "Unknown",
+                              value: doc.specialityId,
+                            },
+                          ])
                       ).values()
                     ).map((speciality) => (
                       <MenuItem key={speciality.value} value={speciality.value}>
@@ -193,27 +161,6 @@ const Filter = () => {
                     ))}
                   </Select>
                 </FormControl>
-                {/* {Object.entries(groupDoctorsBySpeciality(displayedDoctors)).map(
-                  ([specialityId, doctors]) => (
-                    <Box key={specialityId} p={1}>
-                      <Box fontWeight="bold" mb={1}>
-                        {doctors[0]?.specialityName || "Speciality"}
-                      </Box>
-                      {doctors.map((doctor) => (
-                        <Box key={doctor.doctorId} pl={2}>
-                          {doctor.doctorName}
-                        </Box>
-                      ))}
-                      <hr style={{ margin: "0.5em 0" }} />
-                    </Box>
-                  )
-                )}
-                {Object.keys(groupDoctorsBySpeciality(displayedDoctors))
-                  .length === 0 && (
-                  <Box textAlign="center" mt={2}>
-                    No doctors found
-                  </Box>
-                )} */}
               </Box>
             )}
           </Box>
@@ -226,8 +173,8 @@ const Filter = () => {
             setSelectedDate={setSelectedDate}
             filteredDoctors={filteredDoctors}
             slotDuration={15}
-            allDoctorData={searchQuery ? searchDoctorResults : allDoctorData}
             activeTab={activeTab}
+            selectedSpeciality={selectedSpeciality}
           />
         </Box>
       </Box>
@@ -246,7 +193,7 @@ const CustomDateCalendar = styled(DateCalendar)(() => ({
     fontSize: "12px",
   },
   "& .MuiPickersCalendarHeader-root": {
-    backgroundColor: "rgb(172, 233, 233)",
+    backgroundColor: "#D0DDD0",
     fontSize: "14px",
   },
 }));

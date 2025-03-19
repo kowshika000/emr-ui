@@ -20,22 +20,21 @@
   z-index: 999 !important;
 }
 
-#topbar #branch-select .MuiSvgIcon-root {
+/* #topbar #branch-select .MuiSvgIcon-root {
   color: white;
-}
+} */
 
 .ant-tabs-tab {
-  background-color: #00748b !important;
-  color: #ffffff !important;
-  padding:5px 10px  !important;
+  background-color: #d0ddd0 !important;
+  color: #000000 !important;
+  padding: 5px 10px !important;
 }
 .ant-tabs-tab-active {
-  background-color: rgb(155, 211, 211) !important;
+  background-color: #71bbb2 !important;
 }
 .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #000000 !important;
+  color: #ffffff !important;
 }
-
 
 .table-container .ant-table {
   background-color: #f9f9f9;
@@ -43,9 +42,9 @@
 }
 
 .table-container .ant-table-thead > tr > th {
-  background-color: rgb(126, 184, 184);
-  color: #fff;
-  font-weight: bold;
+  background-color: #71BBB2;
+  color: #0c0c0c;
+  /* font-weight: bold; */
 }
 
 .table-container .ant-table-tbody > tr:nth-child(odd) {

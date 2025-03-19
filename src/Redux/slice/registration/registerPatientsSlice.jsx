@@ -6,13 +6,22 @@ export const registerPatients = createAsyncThunk(
   "patient/registerPatients",
   async (credentials, { rejectWithValue }) => {
     try {
+      const formData = new FormData();
+
+      Object.keys(credentials).forEach((key) => {
+        formData.append(key, credentials[key]);
+      });
+
       const response = await axiosInstance.post(
         API_ENDPOINTS.REGISTER_PATIENT,
-        credentials
+        formData
       );
-      return response;
+
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Something went wrong"
+      );
     }
   }
 );

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 import _ from "lodash";
 import "../Appointment.css";
-import { fetchData, postData } from "../../../core/services/APIService";
+// import { fetchData, postData } from "../../../core/services/APIService";
 import { useLoading } from "../../../components/global/loader/LoadingContext";
 import EMRLoader from "../../../components/global/loader/EMRLoaderOverlay";
 import { showToast } from "../../../components/global/Toast";
@@ -24,17 +24,17 @@ import {
   // InputAdornment,
   FormControlLabel,
   Checkbox,
-  Grid,
+  // Grid,
   RadioGroup,
   Radio,
   FormControl,
-  FormLabel,
+  // FormLabel,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { searchPatients } from "../../../Redux/slice/appointement/searchPatientSlice";
 import { useSelector } from "react-redux";
 import { bookAppointment } from "../../../Redux/slice/appointement/bookAppointementSlice";
-import FormInput from "../../../components/FormFields/FormInput";
+// import FormInput from "../../../components/FormFields/FormInput";
 
 const NewEventModal = ({
   open,
@@ -58,12 +58,11 @@ const NewEventModal = ({
   const { loading, setLoading } = useLoading();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState();
 
   const dispatch = useDispatch();
-  // console.log("selectedData:", selecteddoctorData);
   const { searchPatientData } = useSelector((state) => state?.searchPatient);
+  console.log("selectedData:", searchPatientData);
 
   const handleSearchChange = (e) => {
     const inputValue = e.target.value;
@@ -87,8 +86,9 @@ const NewEventModal = ({
       timeInterval: parseInt(slotDuration),
       appointmentTime: moment(selectedSlot.start).format("HH:mm:ss"),
       appointmentEndTime: moment(selectedSlot.end).format("HH:mm:ss"),
-      specialityId: selecteddoctorData.specialityId,
+      specialityId: selecteddoctorData.selectedSpecialityData?.specialityId,
       doctorId: selecteddoctorData.doctorId,
+      patientId: selectedPatient?.patientId,
     };
 
     let payload = { ...eventData, ...otherData };
@@ -112,7 +112,8 @@ const NewEventModal = ({
       age: payload.age,
       gender: payload.gender,
       phoneNo: payload.phoneNo,
-      email: payload.email,
+      email: payload.emailId,
+      patientId: payload.patientId,
     };
 
     try {
@@ -243,7 +244,7 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
     age: "",
     gender: "",
     phoneNo: "",
-    email: "",
+    emailId: "",
     notes: "",
     additionalInfo: "",
     insurarName: "",
@@ -386,10 +387,11 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
         />
 
         <TextField
+          select
           fullWidth
           name="gender"
           value={formData.gender}
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, "input", true)}
           variant="outlined"
           size="small"
           label={
@@ -398,7 +400,11 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
               Gender <span style={{ color: "red" }}>*</span>
             </>
           }
-        />
+        >
+          <MenuItem value={"Female"}>Female</MenuItem>
+          <MenuItem value={"Male"}>Male</MenuItem>
+          <MenuItem value={"Other"}>Other</MenuItem>
+        </TextField>
 
         <TextField
           fullWidth
@@ -424,9 +430,9 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
 
         <TextField
           fullWidth
-          name="email"
-          value={formData.email}
-          type="email"
+          name="emailId"
+          value={formData.emailId}
+          type="emailId"
           onChange={handleChange}
           variant="outlined"
           size="small"
@@ -484,7 +490,7 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
           label="Notify Patient"
         />
         {showNotify && (
-          <FormControl component="fieldset"  >
+          <FormControl component="fieldset">
             {/* <FormLabel component="legend">Notification Method</FormLabel> */}
             <RadioGroup
               name="notifyPatient"

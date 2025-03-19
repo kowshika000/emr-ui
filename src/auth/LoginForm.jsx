@@ -32,17 +32,26 @@ const LoginForm = ({ setShowForgotPage, setShowLoginPage, setShowSignup }) => {
     return errors;
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
     if (Object.keys(formErrors).length === 0) {
-      dispatch(login(formValues));
-      navigate("/secure/landing");
+      try {
+        const resultAction = await dispatch(login(formValues));
+        if (login.fulfilled.match(resultAction)) {
+          navigate("/secure/landing"); 
+        } else {
+          showToast("Invalid email or password!");
+        }
+      } catch (error) {
+        showToast("Something went wrong!!");
+      }
     } else {
       setErrors(formErrors);
-      showToast("Someting went wrong !!");
+      showToast("Something went wrong!!");
     }
   };
+  
 
   const handleChange = (field) => (e) => {
     setFormValues({ ...formValues, [field]: e.target.value });

@@ -7,7 +7,11 @@ import {
   InputLabel,
   FormControl,
   FormHelperText,
+  Button,
+  IconButton,
+  Typography,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const FormInput = ({
   label,
@@ -20,11 +24,11 @@ const FormInput = ({
   ...props
 }) => {
   const [error, setError] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(value || null);
 
-  // Function to format date as "YYYY-MM-DD"
   const formatDate = (date) => {
     if (!date) return "";
-    return new Date(date).toISOString().split("T")[0]; // Converts to "YYYY-MM-DD"
+    return new Date(date).toISOString().split("T")[0];
   };
 
   const handleBlur = () => {
@@ -35,32 +39,30 @@ const FormInput = ({
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      onChange(file);
+      setError(false);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    onChange(null);
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       {type === "select" ? (
         <FormControl
           required={required}
           error={error}
-          variant="standard"
-          sx={{
-            width: "100%",
-            "& .css-5lvf42-MuiSelect-select-MuiInputBase-input-MuiInput-input":
-              {
-                backgroundColor: "white",
-                borderRadius: "4px",
-              },
-          }}
+          size="small"
+          sx={{ width: "100%" }}
         >
-          <InputLabel
-            shrink={true}
-            sx={{
-              color: "rgb(54, 54, 54)",
-              fontSize: "16px",
-              "&.Mui-focused": { color: "rgb(43, 43, 43)" },
-            }}
-          >
-            {label}
-          </InputLabel>
+          <InputLabel>{label}</InputLabel>
           <Select
             value={value || ""}
             onChange={(e) => {
@@ -72,19 +74,7 @@ const FormInput = ({
             }}
             onBlur={handleBlur}
             label={label}
-            sx={{
-              width: "100%",
-              fontSize: "12px",
-              "&:before": {
-                borderBottom: "1px solid rgb(129, 129, 129)",
-              },
-              "&:after": {
-                borderBottom: "1px solid rgb(129, 129, 129)",
-              },
-              "&.Mui-focused:before": {
-                borderBottom: "1px solid rgb(129, 129, 129) !important",
-              },
-            }}
+            sx={{ width: "100%" }}
             {...props}
           >
             <MenuItem value="" disabled>
@@ -100,8 +90,41 @@ const FormInput = ({
               </MenuItem>
             ))}
           </Select>
-          {error && <FormHelperText>{label} is required</FormHelperText>}
+          {/* {error && <FormHelperText>{label} is required</FormHelperText>} */}
         </FormControl>
+      ) : type === "file" ? (
+        <Box>
+          {!selectedFile ? (
+            <Button
+              variant="outlined"
+              component="label"
+              className="w-100 my-auto"
+            >
+              Upload {label}
+              <input type="file" hidden onChange={handleFileChange} />
+            </Button>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                padding: "4px 8px",
+                backgroundColor: "#f9f9f9",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography sx={{ fontSize: "14px", color: "#333" }}>
+                {selectedFile.name}
+              </Typography>
+              <IconButton size="small" onClick={handleRemoveFile}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
+          {/* {error && <FormHelperText error>{label} is required</FormHelperText>} */}
+        </Box>
       ) : (
         <TextField
           label={label}
@@ -116,39 +139,19 @@ const FormInput = ({
             setError(required && !newValue);
           }}
           onBlur={handleBlur}
-          variant="standard"
+          size="small"
           fullWidth
           required={required}
           type={type === "textarea" ? undefined : type}
           multiline={type === "textarea"}
           rows={type === "textarea" ? 2 : undefined}
           error={error}
-          helperText={error ? `${label} is required` : ""}
+          // helperText={error ? `${label} is required` : ""}
           InputLabelProps={{
-            shrink: true,
-            sx: {
-              color: "rgb(37, 37, 37)",
-              fontSize: "16px",
-              "&.Mui-focused": { color: "rgb(51, 51, 51)" },
-            },
+            shrink: type === "date" || type === "time" ? true : undefined,
           }}
           inputProps={{
             ...(type === "date" && { pattern: "\\d{4}-\\d{2}-\\d{2}" }),
-          }}
-          sx={{
-            "& .MuiInput-underline:before": {
-              borderBottom: "1px solid rgb(129, 129, 129)",
-            },
-            "& .MuiInput-underline:hover:before": {
-              borderBottom: "1px solid rgb(129, 129, 129)",
-            },
-            "& .MuiInput-underline:after": {
-              borderBottom: "1px solid rgb(129, 129, 129)",
-            },
-            "& .css-1yrc8ca-MuiInputBase-input-MuiInput-input": {
-              backgroundColor: "white",
-              borderRadius: "4px",
-            },
           }}
           {...props}
         />
@@ -157,7 +160,6 @@ const FormInput = ({
   );
 };
 
-// Function to calculate age based on DOB (optional)
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
   const today = new Date();

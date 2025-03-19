@@ -8,8 +8,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { showToast } from "../../../components/global/Toast";
 import NewEventModal from "../component/NewEvent";
 import EMRLoader from "../../../components/global/loader/EMRLoaderOverlay";
-import Reschedule from "./modal/Reschedule";
-import CancelAlertModal from "./modal/Cancel";
 import EventDisplayComponent from "./Events";
 
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -20,6 +18,7 @@ const CalendarView = ({
   filteredDoctors,
   slotDuration,
   activeTab,
+  selectedSpeciality,
 }) => {
   const localizer = momentLocalizer(moment);
   const dispatch = useDispatch();
@@ -30,58 +29,81 @@ const CalendarView = ({
   const [events, setEvents] = useState([]);
   const [selectedDoctorAvailability, setSelectedDoctorAvailability] =
     useState(null);
-  const [rescheduleBooking, setRescheduleBooking] = useState(false);
-  const [cancelBooking, setCancelBooking] = useState(false);
 
   const addEventToState = (newEvent) => {
+    if (!newEvent.title) {
+      console.error("Event title is missing!", newEvent);
+      return;
+    }
     setEvents([...events, newEvent]);
   };
 
   const { doctorAvailableData, loading } = useSelector(
     (state) => state?.docAvailable || []
   );
+
   useEffect(() => {
     setDoctorAvailabilities(doctorAvailableData?.data);
   }, [doctorAvailableData]);
+
   const formatTime = (date) => moment(date).format("HH:mm");
 
-  const isSlotAvailable = (slotTime, resourceId) => {
+  const isSlotAvailable = (slotTime, resourceId, specialityId) => {
     if (!doctorAvailabilities || !Array.isArray(doctorAvailabilities))
       return false;
 
-    const availability = doctorAvailabilities.find(
-      (doctor) => doctor.doctorId === Number(resourceId)
-    )?.availableSlots;
+    const doctor = doctorAvailabilities.find(
+      (doc) => doc.doctorId === Number(resourceId)
+    );
+    if (!doctor || !doctor.specialitySlots) return false;
 
-    return availability?.includes(slotTime);
+    const speciality = doctor.specialitySlots.find(
+      (spec) => spec.specialityId === Number(specialityId)
+    );
+    if (!speciality) return false;
+
+    return (
+      speciality.availableSlots.includes(slotTime) &&
+      !speciality.bookedSlots.includes(slotTime)
+    );
   };
 
-  const isSlotBooked = (slotTime, resourceId) => {
+  const isSlotBooked = (slotTime, resourceId, specialityId) => {
     if (!doctorAvailabilities || !Array.isArray(doctorAvailabilities))
       return false;
 
-    const booked = doctorAvailabilities.find(
-      (doctor) => doctor.doctorId === Number(resourceId)
-    )?.bookedSlots;
+    const doctor = doctorAvailabilities.find(
+      (doc) => doc.doctorId === Number(resourceId)
+    );
+    if (!doctor || !doctor.specialitySlots) return false;
 
-    return booked?.includes(slotTime);
+    const speciality = doctor.specialitySlots.find(
+      (spec) => spec.specialityId === Number(specialityId)
+    );
+    if (!speciality) return false;
+
+    return speciality.bookedSlots.includes(slotTime);
   };
 
   const customSlotPropGetter = useMemo(() => {
     return (date, resourceId) => {
       const timeString = formatTime(date);
-      const isAvailable = isSlotAvailable(timeString, resourceId);
-      const isBooked = isSlotBooked(timeString, resourceId);
+      const isAvailable = isSlotAvailable(
+        timeString,
+        resourceId,
+        selectedSpeciality
+      );
+      const isBooked = isSlotBooked(timeString, resourceId, selectedSpeciality);
 
       let className = "";
-      let bgColor = "rgb(197, 197, 197)"; // Default Unavailable Color
+      let bgColor = "#D0DDD0";
 
       if (isBooked) {
         className = "booked-slot";
-        bgColor = "rgb(138, 216, 190)"; // Booked slot color
+        bgColor = "#9db4c0";
       } else if (isAvailable) {
         className = "available-slot";
-        bgColor = "rgb(158, 213, 223)"; // Available slot color
+        bgColor = "#90e0ef";
       }
 
       return {
@@ -92,7 +114,7 @@ const CalendarView = ({
         },
       };
     };
-  }, [doctorAvailabilities]);
+  }, [doctorAvailabilities, selectedSpeciality]);
 
   const getAvailableSlotsForAllDoctors = useCallback(() => {
     if (selectedDate) {
@@ -109,7 +131,6 @@ const CalendarView = ({
   }, [dispatch, selectedDate, slotDuration]);
 
   useEffect(() => {
-    console.log("Fetching available slots...");
     getAvailableSlotsForAllDoctors();
   }, [getAvailableSlotsForAllDoctors]);
 
@@ -134,40 +155,55 @@ const CalendarView = ({
   }, [filteredDoctors, activeTab, setCalendarResources]);
 
   const onSelectSlot = (slotInfo) => {
-    const selectedTime = moment(slotInfo.start);
-    if (selectedTime.isBefore(moment(), "minute")) {
+    const selectedTime = moment(slotInfo.start).format("HH:mm");
+    const resourceId = slotInfo.resourceId;
+    const specialityId = selectedSpeciality; // Ensure this is correctly assigned
+
+    if (moment(slotInfo.start).isBefore(moment(), "minute")) {
       showToast(["You cannot select a past time slot."], "error");
       return;
     }
 
-    if (
-      isSlotAvailable(formatTime(slotInfo.start), slotInfo.resourceId) ||
-      isSlotBooked(formatTime(slotInfo.start), slotInfo.resourceId)
-    ) {
-      setSelectedSlot(slotInfo);
-      setSelectedDoctorAvailability(
-        doctorAvailabilities.find(
-          (doctor) => doctor.doctorId === parseInt(slotInfo.resourceId)
-        )
+    // Check availability and booking status
+    const available = isSlotAvailable(selectedTime, resourceId, specialityId);
+    const booked = isSlotBooked(selectedTime, resourceId, specialityId);
+
+    if (available || booked) {
+      const doctorData = doctorAvailabilities.find(
+        (doctor) => doctor.doctorId === Number(resourceId)
       );
+
+      if (doctorData) {
+        const selectedSpecialityData = doctorData.specialitySlots.find(
+          (spec) => spec.specialityId === Number(specialityId)
+        );
+
+        setSelectedDoctorAvailability({
+          ...doctorData,
+          selectedSpecialityData, // Include the speciality data
+        });
+      }
+
+      setSelectedSlot(slotInfo);
       setOpen(true);
     } else {
       showToast(["The selected time slot is not available."], "error");
     }
   };
 
-  const eventStyleGetter = () => ({
+  const eventStyleGetter = (event) => ({
     style: {
       backgroundColor: "inherit",
       color: "black",
+      marginTop: "5px",
       border: "none",
-      width: "192px",
-      justifyContent: "center",
-      alignItems: "center",
+      outline: "none",
+      // border: "1px solid #000",
+      // padding: "5px",
+      // textAlign: "center",
+      // borderRadius: "4px",
     },
   });
-
-  console.log("selectedDoctorAvailability", selectedDoctorAvailability);
 
   return (
     <Box width="100%" overflow="auto">
@@ -182,7 +218,10 @@ const CalendarView = ({
         date={selectedDate}
         selectable
         localizer={localizer}
-        events={events}
+        events={events.map((event) => ({
+          ...event,
+          title: event.title || "No Title",
+        }))}
         resources={usersResources}
         resourceIdAccessor="id"
         resourceTitleAccessor="title"
@@ -198,7 +237,6 @@ const CalendarView = ({
         toolbar
         eventPropGetter={eventStyleGetter}
         slotPropGetter={customSlotPropGetter}
-        tooltipAccessor={() => ""}
         scrollToTime={new Date(1970, 1, 1, 9, 0, 0)}
       />
       {open && (
@@ -216,20 +254,6 @@ const CalendarView = ({
           addEventToState={addEventToState}
         />
       )}
-      {/* {rescheduleBooking && (
-        <Reschedule
-          handleClose={() => setRescheduleBooking(false)}
-          appointmentId={selectedSlot.appointmentId}
-          // doctorId = ""
-        />
-      )}
-      {cancelBooking && (
-        <CancelAlertModal
-          handleClose={() => setCancelBooking(false)}
-          appointmentId={selectedSlot.appointmentId}
-          getAvailableSlotsForAllDoctors={getAvailableSlotsForAllDoctors}
-        />
-      )} */}
     </Box>
   );
 };
