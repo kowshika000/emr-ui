@@ -11,7 +11,14 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import { AppRegistration, Cancel, Schedule, Replay } from "@mui/icons-material";
+import {
+  AppRegistration,
+  Cancel,
+  Schedule,
+  Replay,
+  Note,
+  Phone,
+} from "@mui/icons-material";
 import CancelAlertModal from "./modal/Cancel";
 import Reschedule from "./modal/Reschedule";
 import { useNavigate } from "react-router-dom";
@@ -40,55 +47,74 @@ const EventDisplayComponent = ({
     const groupedBookings = {};
 
     doctorAvailableData.data.forEach((doctor) => {
-      doctor?.bookedSlotDetails?.forEach((slot) => {
-        const timeKey = moment(slot.appointmentTime, "HH:mm").format("HH:mm");
+      doctor?.specialitySlots?.forEach((speciality) => {
+        speciality?.bookedSlotDetails?.forEach((slot) => {
+          const timeKey = moment(slot.appointmentTime, "HH:mm").format("HH:mm");
 
-        if (!groupedBookings[timeKey]) groupedBookings[timeKey] = [];
-        groupedBookings[timeKey].push({ ...slot, doctorId: doctor.doctorId });
+          const bookingKey = `${doctor.doctorId}-${speciality.specialityId}`;
+
+          if (!groupedBookings[timeKey]) {
+            groupedBookings[timeKey] = {};
+          }
+
+          if (!groupedBookings[timeKey][bookingKey]) {
+            groupedBookings[timeKey][bookingKey] = [];
+          }
+
+          groupedBookings[timeKey][bookingKey].push({
+            doctorId: doctor.doctorId,
+            specialityId: speciality.specialityId,
+            appointmentId: slot.appointmentId,
+            appointmentTime: slot.appointmentTime,
+            appointmentDate: slot.appointmentDate,
+            patientName: slot.patientName || "--",
+            phoneNo: slot.phoneNo || "--",
+            mrdNo: slot.mrdNo || null,
+            notes: slot.notes || "--",
+          });
+        });
       });
     });
 
-    const bookedEvents = Object.entries(groupedBookings).map(
-      ([timeKey, slots]) => {
+    const bookedEvents = [];
+
+    Object.entries(groupedBookings).forEach(([timeKey, bookingGroups]) => {
+      Object.entries(bookingGroups).forEach(([bookingKey, slots]) => {
         const firstSlot = slots[0];
 
-        return {
+        bookedEvents.push({
           title: (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               {slots.length === 1 ? (
-                <div className="d-flex flex-column">
-                  <div className="d-flex align-items-center gap-2">
-                    <div style={avatarStyle}>
-                      {firstSlot.patientName?.charAt(0) || "--"}
+                <div className="d-flex flex-row gap-3">
+                  <div className="d-flex flex-column">
+                    <div className="d-flex align-items-center gap-2">
+                      <div style={avatarStyle}>
+                        {firstSlot.mrdNo ? "F" : "N"}
+                      </div>
+                      <span style={{ fontWeight: "bold" }}>
+                        {firstSlot.patientName || "--"}
+                      </span>
                     </div>
-                    <span style={{ fontWeight: "bold" }}>
-                      {firstSlot.patientName || "--"}
-                    </span>
+                    <div className="mt-1">
+                      &nbsp; <Phone /> &nbsp;&nbsp;
+                      {firstSlot.phoneNo || "--"}
+                    </div>
+                    <div className="mt-1">
+                      &nbsp; <Note /> &nbsp;&nbsp;
+                      {firstSlot.notes || "--"}
+                    </div>
                   </div>
-                  <div className="mt-1">
-                    <i className="bi bi-telephone m-1"></i>{" "}
-                    {firstSlot.phoneNo || "--"}
-                  </div>
-                  <Box>
+                  <Box className="d-flex flex-column flex-wrap">
                     <Tooltip title="Reschedule">
                       <IconButton
                         onClick={() => {
                           setRescheduleBooking(true);
                           setSelectedSlot(firstSlot);
                         }}
-                        color="primary"
+                        sx={{ padding: "2px", color: "blue", marginY: "3px" }}
                       >
                         <Schedule />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Cancel">
-                      <IconButton
-                        onClick={() => {
-                          setCancelBooking(true);
-                          setSelectedSlot(firstSlot);
-                        }}
-                      >
-                        <Cancel />
                       </IconButton>
                     </Tooltip>
                     <Tooltip
@@ -100,8 +126,21 @@ const EventDisplayComponent = ({
                             state: { bookedDetails: firstSlot },
                           })
                         }
+                        sx={{ padding: "2px", color: "green" }}
                       >
                         {firstSlot.mrdNo ? <Replay /> : <AppRegistration />}
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Cancel">
+                      <IconButton
+                        onClick={() => {
+                          setCancelBooking(true);
+                          setSelectedSlot(firstSlot);
+                        }}
+                        sx={{ padding: "2px", color: "red" }}
+                      >
+                        <Cancel />
                       </IconButton>
                     </Tooltip>
                   </Box>
@@ -125,14 +164,15 @@ const EventDisplayComponent = ({
           start: moment(timeKey, "HH:mm").toDate(),
           end: moment(timeKey, "HH:mm").add(slotDuration, "minutes").toDate(),
           resourceId: firstSlot.doctorId,
+          specialityId: firstSlot.specialityId, // Ensure specialityId is included
           appointmentId: firstSlot.appointmentId,
-          className: "booked-slot", // Add a class for styling
-        };
-      }
-    );
+          className: "booked-slot",
+        });
+      });
+    });
 
     if (typeof setEvents === "function") {
-      setEvents(bookedEvents); // Update events directly (no duplicates)
+      setEvents(bookedEvents);
     }
   }, [doctorAvailableData, slotDuration]);
 

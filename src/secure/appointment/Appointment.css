@@ -82,11 +82,6 @@ label {
   background-color: #a9adad !important;
 } */
 
-.tooltip-inner {
-  background-color: #6500bf !important;
-  max-width: fit-content !important;
-}
-
 .rbc-time-slot {
   height: 90px !important;
 }
@@ -182,3 +177,11 @@ textarea {
   border: none  !important;
   width: 192px !important;
 } */
+
+.rbc-event {
+  pointer-events: auto;
+}
+
+.rbc-event[title]::after {
+  display: none !important; /* Hide the tooltip */
+}

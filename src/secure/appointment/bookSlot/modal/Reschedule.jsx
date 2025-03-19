@@ -30,9 +30,9 @@ const Reschedule = ({
   const [date, setDate] = useState(dayjs());
   const [time, setTime] = useState(dayjs());
   const dispatch = useDispatch();
-  const { data } = useSelector((state) => state.reschedule);
+  const { statusCode } = useSelector((state) => state.reschedule);
 
-  const status = data.statusCode;
+  console.log(statusCode, "code");
 
   console.log("doctor id:", doctorId);
 
@@ -57,7 +57,7 @@ const Reschedule = ({
 
       await getAvailableSlotsForAllDoctors();
       handleClose();
-      showToast(["Appointment Re scheduled successfully"], "success");
+      // showToast(["Appointment Re scheduled successfully"], "success");
     } catch (error) {
       showToast([error || "Something went wrong"], "error");
     }

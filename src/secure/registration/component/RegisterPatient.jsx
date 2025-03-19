@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { showToast } from "../../../components/global/Toast";
 import { Link, useLocation } from "react-router-dom";
 import { PatientInfo } from "./PatientInfo/PatientInfo";
+import { allDoctors } from "../../../Redux/slice/appointement/allDoctorsSlice";
 
 const RegisterPatient = () => {
   const OPTION = DropdownOptions;
@@ -19,18 +20,89 @@ const RegisterPatient = () => {
   const surgeryPatientData = location.state?.patientData;
   const schedulePatientData = location.state?.rowData;
 
-  console.log("schedulePatientData", schedulePatientData);
+  // console.log("schedulePatientData", schedulePatientData);
 
   const [showPatientInfo, setShowPatientInfo] = useState(false);
   const [patientData, setPatientData] = useState();
 
   const { loading, error } = useSelector((state) => state.regPatient);
   const { registerPatientData } = useSelector((state) => state.regPatient);
+  const { doctorData } = useSelector((state) => state?.allDoctor);
 
-  const getCurrentDate = () => new Date().toISOString().split("T")[0];
+  const allDoctorData = doctorData?.data || [];
 
-  const [formData, setFormData] = useState({
+  const [specialityOptions, setSpecialityOptions] = useState([]);
+  const [doctorOptions, setDoctorOptions] = useState([]);
+
+  useEffect(() => {
+    dispatch(allDoctors());
+  }, []);
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const time = now.toTimeString().split(" ")[0];
+    return `${date} ${time}`;
+  };
+
+  const initialState = {
     image: "",
+    visitType: "",
+    patientName: "",
+    gender: "",
+    dob: "",
+    nationality: "",
+    visaType: "",
+    phoneNumber: "",
+    infoSource: "",
+    address: "",
+    referralCase: "",
+    regDate: getCurrentDateTime(),
+    age: "",
+    email: "",
+    nationalId: "",
+    workPhoneNumber: "",
+    language: "",
+    religion: "",
+    referredBy: "",
+    patientType: "",
+    patientPriority: "",
+    maritalStatus: "",
+    otherId: "",
+    landPhone: "",
+    occupation: "",
+    place: "",
+    patientRemarks: "",
+    speciality: "",
+    encounterType: "",
+    doctorName: "",
+    paymentType: "",
+    subInsurance: "",
+    networkType: "",
+    insuranceCardNo: "",
+    insuranceEffDate: "",
+    certificateNumber: "",
+    maxInsuranceLiability: "",
+    maxInsuranceCopay: "",
+    extraCardNumber: "",
+    insuranceExpireDate: "",
+    dependents: "",
+    insuranceClaimNumber: "",
+    insuranceApprovalLimit: "",
+    copayPatient: "",
+    admissionDate: "",
+    admissionTime: "",
+    expectedDischargeDate: "",
+    expectedDischargeTime: "",
+    admissionNote: "",
+    ward: "",
+    roomNo: "",
+    bedNo: "",
+    bedRate: "",
+    accomodationNote: "",
+  };
+  const [formData, setFormData] = useState({
+    // image: "",
     visitType: surgeryPatientData ? "In Patient" : "" || "",
     patientName:
       bookedDetails?.patientName ||
@@ -49,7 +121,7 @@ const RegisterPatient = () => {
     infoSource: "",
     address: "",
     referralCase: "",
-    regDate: getCurrentDate(),
+    regDate: getCurrentDateTime(),
     age: "",
     email: bookedDetails?.emailId || schedulePatientData?.emailId || "",
     nationalId: "",
@@ -60,7 +132,8 @@ const RegisterPatient = () => {
     patientType: "",
     patientPriority: "",
     maritalStatus: "",
-    otherId: "",
+    otherIdName: "",
+    otherIdNo: "",
     landPhone: "",
     occupation: "",
     place: "",
@@ -73,16 +146,17 @@ const RegisterPatient = () => {
     subInsurance: "",
     networkType: "",
     insuranceCardNo: "",
-    insuranceEffectiveFrom: "",
+    insuranceEffDate: "",
     certificateNumber: "",
     maxInsuranceLiability: "",
     maxInsuranceCopay: "",
     extraCardNumber: "",
     insuranceExpireDate: "",
-    dependentsNo: "",
+    dependents: "",
     insuranceClaimNumber: "",
     insuranceApprovalLimit: "",
     copayPatient: "",
+    existing: "no",
     admissionDate: "",
     admissionTime: "",
     expectedDischargeDate: surgeryPatientData?.exp_discharge_date || "",
@@ -95,15 +169,40 @@ const RegisterPatient = () => {
     accomodationNote: "",
   });
 
+  // Extract unique speciality names
+  useEffect(() => {
+    const specialities = [
+      ...new Set(allDoctorData.map((doctor) => doctor.specialityName)),
+    ].map((name) => ({ label: name, value: name }));
+
+    setSpecialityOptions(specialities);
+  }, [allDoctorData]);
+
+  // Filter doctors based on selected speciality
+  useEffect(() => {
+    if (formData.speciality) {
+      const filteredDoctors = allDoctorData
+        .filter((doctor) => doctor.specialityName === formData.speciality)
+        .map((doctor) => ({
+          label: doctor.doctorName,
+          value: doctor.doctorId,
+        }));
+
+      setDoctorOptions(filteredDoctors);
+    } else {
+      setDoctorOptions([]);
+    }
+  }, [formData.speciality, allDoctorData]);
+
   const handleInputChange = (field, value) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: value,
+      // ...(field === "speciality" && { doctorName: "" }),
     }));
   };
 
   const registerPatient = () => {
-    // Required fields validation
     const requiredFields = [
       "visitType",
       "patientName",
@@ -117,7 +216,7 @@ const RegisterPatient = () => {
       "nationalId",
       "patientPriority",
       "gender",
-      "otherId",
+      // "otherId",
       "maritalStatus",
       "occupation",
       "speciality",
@@ -125,86 +224,30 @@ const RegisterPatient = () => {
       "paymentType",
       "encounterType",
     ];
-    // const missingFields = requiredFields.filter((field) => !formData[field]);
-    // if (missingFields.length > 0) {
-    //   showToast(
-    //     <div>
-    //       <p>Please fill all required fields:</p>
-    //       <ul>
-    //         {missingFields.map((field, index) => (
-    //           <li key={index}>{field}</li>
-    //         ))}
-    //       </ul>
-    //     </div>,
-    //     "error"
-    //   );
-    //   return;
-    // }
-    dispatch(registerPatients(formData));
-    setFormData((prev) => ({
-      ...prev,
-      image: "",
-      visitType: "",
-      patientName: "",
-      gender: "",
-      dob: "",
-      nationality: "",
-      visaType: "",
-      phoneNumber: "",
-      infoSource: "",
-      address: "",
-      referralCase: "",
-      regDate: getCurrentDate(),
-      age: "",
-      email: "",
-      nationalId: "",
-      workPhoneNumber: "",
-      language: "",
-      religion: "",
-      referredBy: "",
-      patientType: "",
-      patientPriority: "",
-      maritalStatus: "",
-      otherId: "",
-      landPhone: "",
-      occupation: "",
-      place: "",
-      patientRemarks: "",
-      speciality: "",
-      encounterType: "",
-      doctorName: "",
-      paymentType: "",
-      subInsurance: "",
-      networkType: "",
-      insuranceCardNo: "",
-      insuranceEffectiveFrom: "",
-      certificateNumber: "",
-      maxInsuranceLiability: "",
-      maxInsuranceCopay: "",
-      extraCardNumber: "",
-      insuranceExpireDate: "",
-      dependentsNo: "",
-      insuranceClaimNumber: "",
-      insuranceApprovalLimit: "",
-      copayPatient: "",
-      admissionDate: "",
-      admissionTime: "",
-      expectedDischargeDate: "",
-      expectedDischargeTime: "",
-      admissionNote: "",
-      ward: "",
-      roomNo: "",
-      bedNo: "",
-      bedRate: "",
-      accomodationNote: "",
-    }));
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+    if (missingFields.length > 0) {
+      showToast(
+        <div>
+          <p>Please fill all required fields:</p>
+          <ul>
+            {missingFields.map((field, index) => (
+              <li key={index}>{field}</li>
+            ))}
+          </ul>
+        </div>,
+        "error"
+      );
+      return;
+    }
+    dispatch(registerPatients(formData)).then(() => {
+      setFormData(initialState);
+    });
   };
-
   useEffect(() => {
     if (registerPatientData?.statusCode === 200) {
       setShowPatientInfo(true);
       setPatientData(registerPatientData?.data);
-    } else if (registerPatientData?.statusCode === 500) {
+    } else if (error) {
       showToast("Something went wrong!!", "error");
     }
   }, [registerPatientData, error]);
@@ -224,7 +267,7 @@ const RegisterPatient = () => {
             </div>
             <Box className="form-details-section">
               <FormInput
-                label={"Upload Photo"}
+                // label={"Upload Photo"}
                 type="file"
                 onChange={(file) => {
                   console.log("Selected file:", file);
@@ -238,6 +281,13 @@ const RegisterPatient = () => {
                 options={OPTION.visitOptions}
                 value={formData.visitType}
                 onChange={(value) => handleInputChange("visitType", value)}
+              />
+              <FormInput
+                label={"Reg Date"}
+                type="date"
+                required={true}
+                value={formData.regDate}
+                onChange={(value) => handleInputChange("regDate", value)}
               />
               <FormInput
                 label={"Patient Name"}
@@ -256,6 +306,33 @@ const RegisterPatient = () => {
                 }
               />
               <FormInput
+                label={"Age"}
+                required={true}
+                value={formData.age}
+                onChange={(value) => handleInputChange("age", value)}
+              />
+              <FormInput
+                label={"Gender"}
+                required={true}
+                type="select"
+                options={OPTION.genderOpton}
+                value={formData.gender}
+                onChange={(value) => handleInputChange("gender", value)}
+              />
+              <FormInput
+                label={"Email ID"}
+                required={true}
+                value={formData.email}
+                onChange={(value) => handleInputChange("email", value)}
+              />
+
+              <FormInput
+                label={"Phone Number"}
+                required={true}
+                value={formData.phoneNumber}
+                onChange={(value) => handleInputChange("phoneNumber", value)}
+              />
+              <FormInput
                 label={"Nationality"}
                 required={true}
                 type="select"
@@ -264,31 +341,42 @@ const RegisterPatient = () => {
                 onChange={(value) => handleInputChange("nationality", value)}
               />
               <FormInput
-                label={"Visa Type"}
-                type="select"
-                options={OPTION.visaTypeOptions}
-                value={formData.visaType}
-                onChange={(value) => handleInputChange("visaType", value)}
-              />
-              <FormInput
-                label={"Phone Number (phoneNumber)"}
-                value={formData.phoneNumber}
-                onChange={(value) => handleInputChange("phoneNumber", value)}
-              />
-              <FormInput
-                label={"Info Source"}
-                type="select"
-                options={OPTION.infoSourceOptions}
-                value={formData.infoSource}
-                onChange={(value) => handleInputChange("infoSource", value)}
+                label={"National Id"}
+                required={true}
+                value={formData.nationalId}
+                onChange={(value) => handleInputChange("nationalId", value)}
               />
               <FormInput
                 label={"Address"}
                 required={true}
-                // type="select"
-                // options={OPTION.addressOptions}
                 value={formData.address}
                 onChange={(value) => handleInputChange("address", value)}
+              />
+              <FormInput
+                label={"Patient Priority"}
+                required={true}
+                type="select"
+                options={OPTION.patientPriorityOptions}
+                value={formData.patientPriority}
+                onChange={(value) =>
+                  handleInputChange("patientPriority", value)
+                }
+              />
+              <FormInput
+                label={"Occupation"}
+                required={true}
+                type="select"
+                options={OPTION.occupationOptions}
+                value={formData.occupation}
+                onChange={(value) => handleInputChange("occupation", value)}
+              />
+              <FormInput
+                label={"Marital Status"}
+                required={true}
+                type="select"
+                options={OPTION.maritalStatusOptions}
+                value={formData.maritalStatus}
+                onChange={(value) => handleInputChange("maritalStatus", value)}
               />
               <FormInput
                 label={"Referral Case"}
@@ -299,30 +387,18 @@ const RegisterPatient = () => {
                 onChange={(value) => handleInputChange("referralCase", value)}
               />
               <FormInput
-                label={"Reg Date"}
-                type="date"
-                required={true}
-                value={formData.regDate}
-                onChange={(value) => handleInputChange("regDate", value)}
+                label={"Info Source"}
+                type="select"
+                options={OPTION.infoSourceOptions}
+                value={formData.infoSource}
+                onChange={(value) => handleInputChange("infoSource", value)}
               />
               <FormInput
-                label={"Age"}
-                required={true}
-                value={formData.age}
-                onChange={(value) => handleInputChange("age", value)}
-              />
-              <FormInput
-                label={"Email ID"}
-                required={true}
-                value={formData.email}
-                onChange={(value) => handleInputChange("email", value)}
-              />
-
-              <FormInput
-                label={"National Id"}
-                required={true}
-                value={formData.nationalId}
-                onChange={(value) => handleInputChange("nationalId", value)}
+                label={"Visa Type"}
+                type="select"
+                options={OPTION.visaTypeOptions}
+                value={formData.visaType}
+                onChange={(value) => handleInputChange("visaType", value)}
               />
               <FormInput
                 label={"Phone Number (Work)"}
@@ -355,53 +431,26 @@ const RegisterPatient = () => {
                 value={formData.patientType}
                 onChange={(value) => handleInputChange("patientType", value)}
               />
+
               <FormInput
-                label={"Patient Priority"}
-                required={true}
-                type="select"
-                options={OPTION.patientPriorityOptions}
-                value={formData.patientPriority}
-                onChange={(value) =>
-                  handleInputChange("patientPriority", value)
-                }
-              />
-              <FormInput
-                label={"Gender"}
-                required={true}
-                type="select"
-                options={OPTION.genderOpton}
-                value={formData.gender}
-                onChange={(value) => handleInputChange("gender", value)}
-              />
-              <FormInput
-                label={"Marital Status"}
-                required={true}
-                type="select"
-                options={OPTION.maritalStatusOptions}
-                value={formData.maritalStatus}
-                onChange={(value) => handleInputChange("maritalStatus", value)}
-              />
-              <FormInput
-                label={"Other ID"}
-                required={true}
+                label={"Other ID Name"}
                 type="select"
                 options={OPTION.otherIdOptions}
-                value={formData.otherId}
-                onChange={(value) => handleInputChange("otherId", value)}
+                value={formData.otherIdName}
+                onChange={(value) => handleInputChange("otherIdName", value)}
+              />
+              <FormInput
+                label={"Other ID No"}
+                // required={true}
+                value={formData.otherIdNo}
+                onChange={(value) => handleInputChange("otherIdNo", value)}
               />
               <FormInput
                 label={"Land Phone"}
                 value={formData.landPhone}
                 onChange={(value) => handleInputChange("landPhone", value)}
               />
-              <FormInput
-                label={"Occupation"}
-                required={true}
-                type="select"
-                options={OPTION.occupationOptions}
-                value={formData.occupation}
-                onChange={(value) => handleInputChange("occupation", value)}
-              />
+
               <FormInput
                 label={"Place"}
                 value={formData.place}
@@ -424,9 +473,17 @@ const RegisterPatient = () => {
                 label={"Speciality"}
                 required={true}
                 type="select"
-                options={OPTION.specialityOptions}
+                options={specialityOptions}
                 value={formData.speciality}
                 onChange={(value) => handleInputChange("speciality", value)}
+              />
+              <FormInput
+                label={"Doctor Name"}
+                required={true}
+                type="select"
+                options={doctorOptions}
+                value={formData.doctorName}
+                onChange={(value) => handleInputChange("doctorName", value)}
               />
               {formData.visitType === "In Patient" ? (
                 ""
@@ -442,14 +499,6 @@ const RegisterPatient = () => {
                   }
                 />
               )}
-              <FormInput
-                label={"Doctor Name"}
-                required={true}
-                type="select"
-                options={OPTION.doctorOptions}
-                value={formData.doctorName}
-                onChange={(value) => handleInputChange("doctorName", value)}
-              />
             </Box>
           </Box>
 
@@ -595,9 +644,9 @@ const RegisterPatient = () => {
                 <FormInput
                   label={"Insurance Effective From"}
                   type="date"
-                  value={formData.insuranceEffectiveFrom}
+                  value={formData.insuranceEffDate}
                   onChange={(value) =>
-                    handleInputChange("insuranceEffectiveFrom", value)
+                    handleInputChange("insuranceEffDate", value)
                   }
                 />
                 <FormInput
@@ -639,8 +688,8 @@ const RegisterPatient = () => {
                 />
                 <FormInput
                   label={"Dependents No"}
-                  value={formData.dependentsNo}
-                  onChange={(value) => handleInputChange("dependentsNo", value)}
+                  value={formData.dependents}
+                  onChange={(value) => handleInputChange("dependents", value)}
                 />
                 <FormInput
                   label={"Insurance Claim No"}

@@ -1,134 +1,127 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  TableContainer,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Select,
-  FormControl,
-  MenuItem,
-  Paper,
-} from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import React, { useState } from "react";
+import { Table, Input, Select, DatePicker } from "antd";
 import moment from "moment";
+
+const { Option } = Select;
 
 const PatientList = () => {
   const [filter, setFilter] = useState({});
-  const [filteredData, setFilteredData] = useState([]);
   const [statusFilter, setStatusFilter] = useState("--All--");
+
   const handleFilterChange = (columnId, value, type) => {
     if (type === "select") {
       setStatusFilter(value);
     }
     setFilter({ ...filter, [columnId]: value });
   };
-   const handleDateChange = (columnId, e) => {
-      let value = moment(e).format("DD/MM/YYYY");
-      if (value === "Invalid date") {
-        setFilter({ ...filter, [columnId]: "" });
-      } else {
-        setFilter({ ...filter, [columnId]: value });
-      }
-    };
+
+  const handleDateChange = (columnId, date) => {
+    let value = date ? moment(date).format("DD/MM/YYYY") : "";
+    setFilter({ ...filter, [columnId]: value });
+  };
+
   const columns = [
-    { id: "s_no", label: "S.No", filter: false },
-    { id: "patient_type", label: "Registration Date", filter: false },
-    { id: "mr_number", label: "MRD Number", filter: true, type: "input" },
-    // { id: "visit_date", label: "Visit Date", filter: true, type: "date" },
-    { id: "patient_name", label: "Patient name", filter: true, type: "input" },
-    { id: "doctor", label: "DOB", filter: true, type: "input" },
-    { id: "recall_date", label: "Gender", filter: true, type: "date" },
-    { id: "Plan_of_care", label: "Nationality", filter: false },
-    { id: "status", label: "Status", filter: true, type: "select" },
-    { id: "actions", label: "Options", filter: false },
+    {
+      title: "S.No",
+      dataIndex: "s_no",
+      key: "s_no",
+    },
+    {
+      title: "Registration Date",
+      dataIndex: "patient_type",
+      key: "patient_type",
+    },
+    {
+      title: "MRD Number",
+      dataIndex: "mr_number",
+      key: "mr_number",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <Input
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => confirm()}
+          onBlur={() => confirm()}
+          placeholder="Search MRD Number"
+        />
+      ),
+      onFilter: (value, record) =>
+        record.mr_number.toString().toLowerCase().includes(value.toLowerCase()),
+    },
+    {
+      title: "Patient Name",
+      dataIndex: "patient_name",
+      key: "patient_name",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <Input
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => confirm()}
+          onBlur={() => confirm()}
+          placeholder="Search Patient Name"
+        />
+      ),
+      onFilter: (value, record) =>
+        record.patient_name.toLowerCase().includes(value.toLowerCase()),
+    },
+    {
+      title: "DOB",
+      dataIndex: "doctor",
+      key: "doctor",
+    },
+    {
+      title: "Gender",
+      dataIndex: "recall_date",
+      key: "recall_date",
+    },
+    {
+      title: "Nationality",
+      dataIndex: "Plan_of_care",
+      key: "Plan_of_care",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <Select
+          value={selectedKeys[0]}
+          onChange={(value) => {
+            setSelectedKeys(value ? [value] : []);
+            confirm();
+          }}
+          style={{ width: "100%" }}
+        >
+          <Option value="--All--">--All--</Option>
+          <Option value="Active">Active</Option>
+          <Option value="Inactive">Inactive</Option>
+        </Select>
+      ),
+      onFilter: (value, record) => record.status === value,
+    },
+    {
+      title: "Options",
+      dataIndex: "actions",
+      key: "actions",
+      render: (_, record) => <a href="#">Edit</a>,
+    },
   ];
+
+  const data = []; // Add your patient data here
+
   return (
-    <Box width={"100%"}>
-      <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-        <Table>
-          <TableHead sx={{ height: "1em" }}>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell>{column.label}</TableCell>
-              ))}
-            </TableRow>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell padding="8px">
-                  {column.filter && column.type === "input" && (
-                    <TextField
-                      size="small"
-                      className="filter-input"
-                      id={column.id}
-                      value={filter[column.id] || ""}
-                      onChange={(e) =>
-                        handleFilterChange(column.id, e.target.value, "input")
-                      }
-                    >
-                      {column.label}
-                    </TextField>
-                  )}
-                  {column.filter && column.type === "date" && (
-                    <DatePicker
-                      className="filter-input"
-                      slotProps={{ actionBar: { actions: ["clear"] } }}
-                      onChange={(e) => handleDateChange(column.id, e)}
-                      sx={{ width: "130px" }}
-                    />
-                  )}
-                  {column.filter && column.type === "select" && (
-                    <FormControl fullWidth>
-                      <Select
-                        id="status-select"
-                        className="filter-input"
-                        value={statusFilter}
-                        onChange={(e) =>
-                          handleFilterChange(
-                            column.id,
-                            e.target.value,
-                            "select"
-                          )
-                        }
-                      >
-                        {/* {status.map((option, index) => {
-                          return (
-                            <MenuItem
-                              key={`${option.id}_${index}`}
-                              value={option.label}
-                            >
-                              {option.label}
-                            </MenuItem>
-                          );
-                        })} */}
-                      </Select>
-                    </FormControl>
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {/* {filteredData?.map((row) => (
-            <TableRow key={row.id}>
-              {columns.map((column) => {
-                return (
-                  column.id !== "actions" && (
-                    <TableCell key={column.id}>{row[column.id]}</TableCell>
-                  )
-                );
-              })} */}
-            <TableRow>
-              <TableCell>No Data</TableCell>
-            </TableRow>
-            {/* ))} */}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+    <div>
+      <Table
+        className="table-container"
+        columns={columns}
+        dataSource={data}
+        rowKey={(record) => record.s_no}
+        pagination={{ pageSize: 10 }}
+      />
+    </div>
   );
 };
 

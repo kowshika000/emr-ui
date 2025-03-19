@@ -1,14 +1,10 @@
-import React, { useRef, useState } from "react";
-import { Box, Button } from "@mui/material";
-import SignatureCanvas from "react-signature-canvas";
+import React from "react";
+// import SignatureCanvas from "react-signature-canvas";
 import QRCode from "react-qr-code";
+import { Box, Button } from "@mui/material";
+// import { useSearchParams } from "react-router-dom";
 
 export const PatientInfo = ({ patientData, setShowPatientInfo }) => {
-  const sigCanvas = useRef(null);
-  const [signatureURL, setSignatureURL] = useState(null);
-
-  console.log("Patient Data:", patientData);
-
   if (!patientData) {
     return (
       <Box p={3} textAlign="center">
@@ -17,27 +13,7 @@ export const PatientInfo = ({ patientData, setShowPatientInfo }) => {
     );
   }
 
-  const saveSignature = () => {
-    if (!sigCanvas.current) {
-      console.error("Signature pad not initialized.");
-      return;
-    }
-    try {
-      const trimmedCanvas = sigCanvas.current.getTrimmedCanvas();
-      if (trimmedCanvas) {
-        setSignatureURL(trimmedCanvas.toDataURL("image/png"));
-      }
-    } catch (error) {
-      console.error("Error saving signature:", error);
-    }
-  };
-
-  const clearSignature = () => {
-    sigCanvas.current.clear();
-    setSignatureURL(null);
-  };
-
-  const qrCodeUrl = `${window.location.origin}/open-signature`;
+  const qrCodeUrl = `${window.location.origin}/confirm-registration?mrdNo=${patientData?.mrdNo}`;
 
   return (
     <Box p={3} style={{ backgroundColor: "#fff" }}>
@@ -81,46 +57,18 @@ export const PatientInfo = ({ patientData, setShowPatientInfo }) => {
         ].map(({ label, value }) => (
           <Box
             key={label}
-            minWidth="250px"
-            p={1}
-            style={{ borderBottom: "1px solid #ddd" }}
+            minWidth="150px"
+            display={"flex"}
+            flexDirection={"column"}
           >
-            <strong>{label}:</strong> {value ?? "--"}
+            <div style={{ color: "rgb(142, 150, 150)" }}>{label}</div>{" "}
+            <div> {value ?? "--"}</div>
           </Box>
         ))}
       </Box>
-      <Box mt={3} textAlign="center">
-        <h3>Scan to Sign</h3>
-        <QRCode value={qrCodeUrl} width={100} height={100} />
+      <Box mt={3} display="flex" justifyContent="end">
+        <QRCode value={qrCodeUrl} style={{ width: "100px", height: "100px" }} />
       </Box>
-      <Box mt={3} textAlign="center">
-        <h3>Signature</h3>
-        <SignatureCanvas
-          ref={sigCanvas}
-          penColor="black"
-          canvasProps={{
-            width: 300,
-            height: 150,
-            className: "signature-canvas",
-            style: { border: "1px solid #000" },
-          }}
-        />
-        <Box mt={2} display="flex" justifyContent="center" gap={2}>
-          <Button variant="contained" color="primary" onClick={saveSignature}>
-            Save Signature
-          </Button>
-          <Button variant="outlined" color="secondary" onClick={clearSignature}>
-            Clear
-          </Button>
-        </Box>
-      </Box>
-
-      {signatureURL && (
-        <Box mt={3} textAlign="center">
-          <h4>Saved Signature:</h4>
-          <img src={signatureURL} alt="Saved Signature" width={200} />
-        </Box>
-      )}
 
       <Box p={2} display="flex" justifyContent="end">
         <Button

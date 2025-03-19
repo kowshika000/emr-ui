@@ -26,6 +26,7 @@ const OPDetails = React.lazy(() => import("emr_doctor/OPDetails"));
 // const LabMdl = React.lazy(() => import("emr_lab/LabHeaderTab"));
 const NurseModule = React.lazy(() => import("emr_nurse/Dashboard"));
 const NursePage = React.lazy(() => import("emr_nurse/Nurse"));
+const Labratory = React.lazy(() => import("emr_lab/HeaderTabs"));
 
 const BillingLanding = () => {
   const navigate = useNavigate();
@@ -87,13 +88,13 @@ const OpDetailEmrMdl = () => {
   );
 };
 
-// const LabModule = () => {
-//   return (
-//     <Suspense fallback={<Loading />}>
-//       <LabMdl />
-//     </Suspense>
-//   );
-// };
+const LabModule = () => {
+  return (
+    <Suspense fallback={<Loading />}>
+      <Labratory />
+    </Suspense>
+  );
+};
 
 const NurseMdl = () => {
   const navigate = useNavigate();
@@ -110,6 +111,8 @@ const NursePages = () => {
     </Suspense>
   );
 };
+
+
 
 export const SECURE_ROUTES = [
   {
@@ -190,12 +193,12 @@ export const SECURE_ROUTES = [
     secure: true,
     component: OpDetailEmrMdl,
   },
-  // {
-  //   path: `/secure/lab`,
-  //   exact: true,
-  //   secure: true,
-  //   component: LabModule,
-  // },
+  {
+    path: `/secure/lab`,
+    exact: true,
+    secure: true,
+    component: LabModule,
+  },
   {
     path: `/secure/nurseEmr`,
     exact: true,

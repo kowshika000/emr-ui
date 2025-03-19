@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import { Button } from "react-bootstrap";
 import FormInput from "../../../components/FormFields/FormInput";
 import { DropdownOptions } from "../../../components/FormFields/DropdownOptions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { emergencyPatients } from "../../../Redux/slice/registration/emergencyPatientSlice";
 
 const Emergency = () => {
@@ -32,7 +32,8 @@ const Emergency = () => {
     workPhoneNo: "",
     language: "",
     patientType: "",
-    otherId: "",
+    otherIdName: "",
+    otherIdNo: "",
     landPhone: "",
     speciality: "",
     encounterType: "",
@@ -46,6 +47,35 @@ const Emergency = () => {
     }));
   };
 
+  const [specialityOptions, setSpecialityOptions] = useState([]);
+  const [doctorOptions, setDoctorOptions] = useState([]);
+
+  const { doctorData } = useSelector((state) => state?.allDoctor);
+  const allDoctorData = doctorData?.data || [];
+
+  useEffect(() => {
+    const specialities = [
+      ...new Set(allDoctorData.map((doctor) => doctor.specialityName)),
+    ].map((name) => ({ label: name, value: name }));
+
+    setSpecialityOptions(specialities);
+  }, [allDoctorData]);
+
+  useEffect(() => {
+    if (formData.speciality) {
+      const filteredDoctors = allDoctorData
+        .filter((doctor) => doctor.specialityName === formData.speciality)
+        .map((doctor) => ({
+          label: doctor.doctorName,
+          value: doctor.doctorId,
+        }));
+
+      setDoctorOptions(filteredDoctors);
+    } else {
+      setDoctorOptions([]);
+    }
+  }, [formData.speciality, allDoctorData]);
+
   const registerPatient = () => {
     dispatch(emergencyPatients(formData));
   };
@@ -58,7 +88,7 @@ const Emergency = () => {
             <p className="text-dark header">Patient Demographic Details</p>
           </div>
           <Box className="form-details-section">
-            <FormInput
+            {/* <FormInput
               label={"Visit Type"}
               required={true}
               value={formData.visitType}
@@ -70,6 +100,13 @@ const Emergency = () => {
               label={"MRD Number"}
               value={formData.mrdNumber}
               onChange={(value) => handleInputChange("mrdNumber", value)}
+            /> */}
+            <FormInput
+              label={"Reg Date"}
+              type="date"
+              required={true}
+              value={formData.regDate}
+              onChange={(value) => handleInputChange("regDate", value)}
             />
             <FormInput
               label={"Patient Name"}
@@ -88,6 +125,25 @@ const Emergency = () => {
               }
             />
             <FormInput
+              label={"Age"}
+              required={true}
+              value={formData.age}
+              onChange={(value) => handleInputChange("age", value)}
+            />
+            <FormInput
+              label={"Phone Number"}
+              required={true}
+              value={formData.phoneNumber}
+              onChange={(value) => handleInputChange("phoneNumber", value)}
+            />
+            <FormInput
+              label={"Email ID"}
+              required={true}
+              value={formData.email}
+              onChange={(value) => handleInputChange("email", value)}
+            />
+
+            <FormInput
               label={"Nationality"}
               required={true}
               type="select"
@@ -96,16 +152,9 @@ const Emergency = () => {
               onChange={(value) => handleInputChange("nationality", value)}
             />
             <FormInput
-              label={"Visa Type"}
-              type="select"
-              options={OPTION.visaTypeOptions}
-              value={formData.visaType}
-              onChange={(value) => handleInputChange("visaType", value)}
-            />
-            <FormInput
-              label={"Phone Number (Mobile)"}
-              value={formData.phoneNumber}
-              onChange={(value) => handleInputChange("phoneNumber", value)}
+              label={"National Id"}
+              value={formData.nationalId}
+              onChange={(value) => handleInputChange("nationalId", value)}
             />
             <FormInput
               label={"Info Source"}
@@ -115,40 +164,22 @@ const Emergency = () => {
               onChange={(value) => handleInputChange("infoSource", value)}
             />
             <FormInput
-              label={"Reg Date"}
-              type="date"
-              required={true}
-              value={formData.regDate}
-              onChange={(value) => handleInputChange("regDate", value)}
-            />
-            <FormInput
-              label={"Age"}
-              required={true}
-              value={formData.age}
-              onChange={(value) => handleInputChange("age", value)}
-            />
-            <FormInput
-              label={"Email ID"}
-              value={formData.email}
-              onChange={(value) => handleInputChange("email", value)}
+              label={"Visa Type"}
+              type="select"
+              options={OPTION.visaTypeOptions}
+              value={formData.visaType}
+              onChange={(value) => handleInputChange("visaType", value)}
             />
 
-            <FormInput
-              label={"National Id"}
-              value={formData.nationalId}
-              onChange={(value) => handleInputChange("nationalId", value)}
-            />
-            <FormInput
+            {/* <FormInput
               label={"Phone Number (Work)"}
               value={formData.workPhoneNo}
               onChange={(value) => handleInputChange("workPhoneNo", value)}
-            />
+            /> */}
             <FormInput
               label={"Preferred Language"}
               value={formData.language}
-              onChange={(value) =>
-                handleInputChange("language", value)
-              }
+              onChange={(value) => handleInputChange("language", value)}
             />
             <FormInput
               label={"Patient Type"}
@@ -158,11 +189,17 @@ const Emergency = () => {
               onChange={(value) => handleInputChange("patientType", value)}
             />
             <FormInput
-              label={"Other ID"}
+              label={"Other ID Name"}
               type="select"
               options={OPTION.otherIdOptions}
-              value={formData.otherId}
-              onChange={(value) => handleInputChange("otherId", value)}
+              value={formData.otherIdName}
+              onChange={(value) => handleInputChange("otherIdName", value)}
+            />
+            <FormInput
+              label={"Other ID No"}
+              // required={true}
+              value={formData.otherIdNo}
+              onChange={(value) => handleInputChange("otherIdNo", value)}
             />
             <FormInput
               label={"Land Phone"}
@@ -180,9 +217,17 @@ const Emergency = () => {
               label={"Speciality"}
               required={true}
               type="select"
-              options={OPTION.specialityOptions}
+              options={specialityOptions}
               value={formData.speciality}
               onChange={(value) => handleInputChange("speciality", value)}
+            />
+            <FormInput
+              label={"Doctor Name"}
+              required={true}
+              type="select"
+              options={doctorOptions}
+              value={formData.doctorName}
+              onChange={(value) => handleInputChange("doctorName", value)}
             />
             <FormInput
               label={"Encounter Type"}
@@ -191,14 +236,6 @@ const Emergency = () => {
               options={OPTION.encounterTypeOptions}
               value={formData.encounterType}
               onChange={(value) => handleInputChange("encounterType", value)}
-            />
-            <FormInput
-              label={"Doctor Name"}
-              required={true}
-              type="select"
-              options={OPTION.doctorOptions}
-              value={formData.doctorName}
-              onChange={(value) => handleInputChange("doctorName", value)}
             />
           </Box>
         </Box>

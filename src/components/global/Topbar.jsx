@@ -93,27 +93,22 @@ const Topbar = ({ reloadApp, branchId, username, role }) => {
       id="topbar"
       display="flex"
       justifyContent="space-between"
-      p={
-        // currentURL.includes("doctor") ? 0.5 :
-        2
-      }
+      p={2}
       padding={"5px 16px"}
       height={"10%"}
       sx={{
-        backgroundColor:
-          // currentURL.includes("doctor") ? "#e3f2fd" :
-          "#00748b",
+        backgroundColor: "#71BBB2",
+        color: "black",
       }}
     >
-      {/* Receptionist Content */}
       {currentURL.includes("secure") && (
         <>
           <Box display={"flex"} my={"auto"} gap={"10px"}>
-            <Box alignSelf={"center"} fontSize={"26px"} color={"white"}>
+            <Box alignSelf={"center"} fontSize={"26px"}>
               E M R
             </Box>
             <IconButton onClick={() => navigate("/secure/landing")}>
-              <Menu sx={{ color: "white" }} />
+              <Menu />
             </IconButton>
           </Box>
           <Box display="flex" my={"auto"} gap={2}>
@@ -124,7 +119,7 @@ const Topbar = ({ reloadApp, branchId, username, role }) => {
               <Chip
                 label={userData?.roleMaster?.roleName}
                 variant="outlined"
-                sx={{ color: "white", fontSize: "12px" }}
+                sx={{ fontSize: "12px" }}
               />
             </div>
             <Box
@@ -148,15 +143,13 @@ const Topbar = ({ reloadApp, branchId, username, role }) => {
                 }}
               >
                 <Chip
-                  icon={<ShareLocationIcon />}
+                  icon={<ShareLocationIcon color="white" />}
                   label={branchName}
                   sx={{
-                    backgroundColor: "rgb(155, 211, 211)",
-                    color: "black",
+                    backgroundColor: "#71BBB2",
                     fontSize: "12px",
                     textTransform: "capitalize",
                     "&:hover": {
-                      backgroundColor: "rgb(140, 200, 200)",
                       boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
                       transform: "scale(1.05)",
                     },
@@ -172,7 +165,7 @@ const Topbar = ({ reloadApp, branchId, username, role }) => {
                     top: "40px",
                     left: "0",
                     right: "0",
-                    backgroundColor: "rgb(155, 211, 211)",
+                    backgroundColor: "rgb(204, 219, 219)",
                     borderRadius: "5px",
                     zIndex: 1,
                     minWidth: "140px",
@@ -195,26 +188,26 @@ const Topbar = ({ reloadApp, branchId, username, role }) => {
 
             <IconButton onClick={colorMode.toggleColorMode}>
               {theme.palette.mode === "dark" ? (
-                <DarkModeOutlinedIcon sx={{ color: "white" }} />
+                <DarkModeOutlinedIcon />
               ) : (
-                <LightModeOutlinedIcon sx={{ color: "white" }} />
+                <LightModeOutlinedIcon />
               )}
             </IconButton>
             <IconButton>
-              <NotificationsOutlinedIcon sx={{ color: "white" }} />
+              <NotificationsOutlinedIcon />
             </IconButton>
 
             {/* <IconButton onClick={() => navigate("/secure/landing")}>
-              <Menu sx={{ color: "white" }} />
+              <Menu  />
             </IconButton> */}
             <IconButton sx={{ margin: "0 10px" }} onClick={logoutApp}>
-              <LogoutIcon sx={{ color: "white" }} />
+              <LogoutIcon />
             </IconButton>
           </Box>
 
           {/* <div className="my-auto ">
             <IconButton onClick={() => navigate("/secure/landing")}>
-              <Menu sx={{ color: "white" }} />
+              <Menu  />
             </IconButton>
           </div> */}
         </>
