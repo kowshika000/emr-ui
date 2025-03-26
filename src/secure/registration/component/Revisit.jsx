@@ -13,6 +13,8 @@ import { showToast } from "../../../components/global/Toast";
 const Revisit = () => {
   const location = useLocation();
   const surgeryPatientData = location.state?.patientData;
+  const schedulePatientData = location.state?.data;
+  const bookedDetailsData = location.state?.bookedDetails;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
 
@@ -44,18 +46,45 @@ const Revisit = () => {
   };
 
   const [formData, setFormData] = useState({
-    mrdNumber: surgeryPatientData?.mr_no || "",
-    dob: "",
-    gender: "",
-    phoneNumber: surgeryPatientData?.mobile || "",
-    patientName: surgeryPatientData?.patient || "",
-    age: "",
-    nationality: "",
-    nationalId: "",
-    visaType: "",
+    mrdNumber:
+      surgeryPatientData?.mr_no ||
+      schedulePatientData?.mrdNo ||
+      bookedDetailsData?.mrdNo ||
+      "",
+    dob:
+      surgeryPatientData?.dob ||
+      schedulePatientData?.dob ||
+      bookedDetailsData?.dob ||
+      "",
+    gender:
+      surgeryPatientData?.gender ||
+      schedulePatientData?.gender ||
+      bookedDetailsData?.gender ||
+      "",
+    phoneNumber:
+      surgeryPatientData?.mobile ||
+      schedulePatientData?.mobile ||
+      bookedDetailsData?.phoneNo ||
+      "",
+    patientName:
+      surgeryPatientData?.patient ||
+      schedulePatientData?.patientName ||
+      bookedDetailsData?.patientName ||
+      "",
+    age:
+      surgeryPatientData?.age ||
+      schedulePatientData?.age ||
+      bookedDetailsData?.age ||
+      "",
+    nationality:
+      surgeryPatientData?.nationality || schedulePatientData?.nationality || "",
+    nationalId:
+      surgeryPatientData?.nationalId || schedulePatientData?.nationalId || "",
+    visaType:
+      surgeryPatientData?.visaType || schedulePatientData?.visaType || "",
     speciality: "",
     encounterType: "",
-    doctorName: surgeryPatientData?.doctor || "",
+    doctorName: "",
     paymentType: "",
     subInsurance: "",
     networkType: "",
@@ -66,12 +95,13 @@ const Revisit = () => {
     maxInsuranceCopay: "",
     extraCardNumber: "",
     insuranceExpireDate: "",
-    dependents: "",
+    dependentsNo: "",
     insuranceClaimNumber: "",
     insuranceApprovalLimit: "",
     copayPatient: "",
   });
 
+  // Populate Speciality Dropdown
   useEffect(() => {
     const specialities = [
       ...new Set(allDoctorData.map((doctor) => doctor.specialityName)),
@@ -80,6 +110,7 @@ const Revisit = () => {
     setSpecialityOptions(specialities);
   }, [allDoctorData]);
 
+  // Populate Doctor Dropdown when Speciality Changes
   useEffect(() => {
     if (formData.speciality) {
       const filteredDoctors = allDoctorData
@@ -95,6 +126,35 @@ const Revisit = () => {
     }
   }, [formData.speciality, allDoctorData]);
 
+  // Auto-Fill Speciality Based on `bookedDetails.specialityId`
+  useEffect(() => {
+    if (bookedDetailsData?.specialityId) {
+      const speciality = allDoctorData.find(
+        (doc) => doc.specialityId === bookedDetailsData.specialityId
+      )?.specialityName;
+
+      if (speciality) {
+        setFormData((prev) => ({ ...prev, speciality }));
+      }
+    }
+  }, [bookedDetailsData, allDoctorData]);
+
+  // Auto-Fill Doctor AFTER `doctorOptions` is Populated
+  useEffect(() => {
+    if (bookedDetailsData?.doctorId && doctorOptions.length > 0) {
+      const selectedDoctor = doctorOptions.find(
+        (doc) => doc.value === bookedDetailsData.doctorId
+      );
+
+      if (selectedDoctor) {
+        setFormData((prev) => ({
+          ...prev,
+          doctorId: bookedDetailsData.doctorId,
+          doctorName: selectedDoctor.label,
+        }));
+      }
+    }
+  }, [doctorOptions, bookedDetailsData]);
   useEffect(() => {
     if (selectedPatient) {
       setFormData((prevData) => ({
@@ -131,7 +191,7 @@ const Revisit = () => {
       "doctorName",
       "paymentType",
       "encounterType",
-      "phoneNumber"
+      "phoneNumber",
     ];
     const missingFields = requiredFields.filter((field) => !formData[field]);
     if (missingFields.length > 0) {
@@ -148,8 +208,7 @@ const Revisit = () => {
       );
       return;
     }
-    dispatch(revisitPatients({ credentials: formData, patientId }));
-    if (!loading) {
+    dispatch(revisitPatients({ credentials: formData, patientId })).then(() => {
       setFormData((prevData) => ({
         ...prevData,
         mrdNumber: "",
@@ -174,19 +233,21 @@ const Revisit = () => {
         maxInsuranceCopay: "",
         extraCardNumber: "",
         insuranceExpireDate: "",
-        dependents: "",
+        dependentsNo: "",
         insuranceClaimNumber: "",
         insuranceApprovalLimit: "",
         copayPatient: "",
       }));
-    }
-  };
-  useEffect(() => {
-    if (error) {
-      showToast(error || "Something went wrong!!", "error");
-    } else if (data?.revisitPatient) {
       setShowPatientInfo(true);
+    });
+  };
+
+  useEffect(() => {
+    if (data?.revisitPatient) {
       setPatientData(data.revisitPatient);
+      console.log("Updated Patient Data:", data.revisitPatient);
+    } else if (error) {
+      showToast("Something went wrong!!", "error");
     }
   }, [data, error]);
 
@@ -410,8 +471,10 @@ const Revisit = () => {
                   />
                   <FormInput
                     label={"Dependents No"}
-                    value={formData.dependents}
-                    onChange={(value) => handleInputChange("dependents", value)}
+                    value={formData.dependentsNo}
+                    onChange={(value) =>
+                      handleInputChange("dependentsNo", value)
+                    }
                   />
                   <FormInput
                     label={"Insurance Claim No"}

@@ -66,7 +66,12 @@ const PatientRecall = () => {
   };
 
   const columns = [
-    { title: "S.No", dataIndex: "s_no", key: "s_no" },
+    {
+      title: "S.No",
+      dataIndex: "s_no",
+      key: "s_no",
+      render: (_, __, index) => index + 1,
+    },
     {
       title: "MR Number",
       dataIndex: "mr_number",

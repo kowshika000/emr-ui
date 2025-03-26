@@ -17,6 +17,7 @@ import bookAppointmentReducer from "./slice/appointement/bookAppointementSlice";
 import scheduleListReducer from "./slice/dashboard/scheduleListSlice";
 import reScheduleReducer from "./slice/appointement/reScheduleSlice";
 import cancelScheduleReducer from "./slice/appointement/cancelScheduleSlice";
+import patientListReducer from "./slice/registration/patientList";
 
 // import { rootReducer as childRootReducer } from "emr_billing/childRootReducer";
 
@@ -39,6 +40,6 @@ export const rootReducer = combineReducers({
   schedule: scheduleListReducer,
   reschedule: reScheduleReducer,
   cancel: cancelScheduleReducer,
-
+  todayPatientList: patientListReducer,
   // ...childRootReducer,
 });

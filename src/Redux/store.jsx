@@ -17,6 +17,7 @@ import bookAppointmentReducer from "./slice/appointement/bookAppointementSlice";
 import scheduleListReducer from "./slice/dashboard/scheduleListSlice";
 import reScheduleReducer from "./slice/appointement/reScheduleSlice";
 import cancelScheduleReducer from "./slice/appointement/cancelScheduleSlice";
+import patientListReducer from "./slice/registration/patientList";
 
 const staticReducers = {
   auth: authReducer,
@@ -37,6 +38,7 @@ const staticReducers = {
   schedule: scheduleListReducer,
   reschedule: reScheduleReducer,
   cancel: cancelScheduleReducer,
+  todayPatientList: patientListReducer,
 };
 
 const createReducer = (asyncReducers = {}) =>

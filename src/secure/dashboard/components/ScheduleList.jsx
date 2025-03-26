@@ -40,15 +40,23 @@ const ScheduleList = () => {
     setFilters((prev) => ({ ...prev, [key]: formattedDate }));
   };
 
-  const onCreatePatientVisit = () => {
-    navigate("/secure/registration", { state: {} });
+  const onCreatePatientVisit = (rowData) => {
+    console.log("reg data", rowData.data);
+    if (rowData.data.mrdNo) {
+      navigate("/secure/registration?tab=revist_registration", {
+        state: { data: rowData.data },
+      });
+    } else {
+      navigate("/secure/registration?tab=register_patient", {
+        state: { data: rowData.data },
+      });
+    }
   };
-
   const dropDownMenuItems = [
     {
       name: "Create Patient Visit",
       icon: MedicalInformationOutlined,
-      callback: onCreatePatientVisit,
+      callback: (rowData) => onCreatePatientVisit(rowData),
     },
   ];
 

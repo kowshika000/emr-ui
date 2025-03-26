@@ -6,7 +6,6 @@ import {
   Select,
   InputLabel,
   FormControl,
-  FormHelperText,
   Button,
   IconButton,
   Typography,
@@ -28,15 +27,22 @@ const FormInput = ({
 
   const formatDate = (date) => {
     if (!date) return "";
-    return new Date(date).toISOString().split("T")[0];
+    return new Date(date).toISOString().split("T")[0]; // Converts to YYYY-MM-DD
+  };
+
+  const formatDateTime = (dateTime) => {
+    if (!dateTime) return "";
+    const date = new Date(dateTime);
+    return date.toISOString().slice(0, 19).replace("T", " "); // Converts to YYYY-MM-DD HH:MM:SS
+  };
+
+  const formatDateTimeInput = (dateTime) => {
+    if (!dateTime) return "";
+    return dateTime.replace("T", " "); // Converts to YYYY-MM-DD HH:MM:SS
   };
 
   const handleBlur = () => {
-    if (required && !value) {
-      setError(true);
-    } else {
-      setError(false);
-    }
+    setError(required && !value);
   };
 
   const handleFileChange = (event) => {
@@ -90,7 +96,6 @@ const FormInput = ({
               </MenuItem>
             ))}
           </Select>
-          {/* {error && <FormHelperText>{label} is required</FormHelperText>} */}
         </FormControl>
       ) : type === "file" ? (
         <Box>
@@ -123,19 +128,30 @@ const FormInput = ({
               </IconButton>
             </Box>
           )}
-          {/* {error && <FormHelperText error>{label} is required</FormHelperText>} */}
         </Box>
       ) : (
         <TextField
           label={label}
-          value={type === "date" ? formatDate(value) : value}
+          value={
+            type === "date"
+              ? formatDate(value)
+              : type === "datetime-local"
+              ? formatDateTime(value)
+              : value
+          }
           onChange={(e) => {
-            const newValue = e.target.value;
-            if (type === "date" && setDependentValue) {
-              const calculatedAge = calculateAge(newValue);
-              setDependentValue(calculatedAge);
+            let newValue = e.target.value;
+
+            if (type === "datetime-local") {
+              newValue = newValue.replace("T", " ");
             }
+
             onChange(newValue);
+
+            if (type === "date" && setDependentValue) {
+              setDependentValue(calculateAge(newValue));
+            }
+
             setError(required && !newValue);
           }}
           onBlur={handleBlur}
@@ -146,12 +162,17 @@ const FormInput = ({
           multiline={type === "textarea"}
           rows={type === "textarea" ? 2 : undefined}
           error={error}
-          // helperText={error ? `${label} is required` : ""}
           InputLabelProps={{
-            shrink: type === "date" || type === "time" ? true : undefined,
+            shrink:
+              type === "date" || type === "time" || type === "datetime-local"
+                ? true
+                : undefined,
           }}
           inputProps={{
             ...(type === "date" && { pattern: "\\d{4}-\\d{2}-\\d{2}" }),
+            ...(type === "datetime-local" && {
+              step: 1, // Allows seconds in datetime-local input
+            }),
           }}
           {...props}
         />
@@ -163,10 +184,10 @@ const FormInput = ({
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
   const today = new Date();
-  const age = today.getFullYear() - birthDate.getFullYear();
+  let age = today.getFullYear() - birthDate.getFullYear();
   const m = today.getMonth() - birthDate.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    return age - 1;
+    age--;
   }
   return age;
 };

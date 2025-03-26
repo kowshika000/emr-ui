@@ -17,4 +17,5 @@ export const API_ENDPOINTS = {
   SCHEDULE_LIST: "doctorappointment/getScheduleList",
   RE_SCHEDULE: "doctorappointment/rescheduleAppointment",
   CANCEL_SCHEDULE: "doctorappointment/cancelAppointment",
+  PATIENT_LIST : "patient/today"
 };

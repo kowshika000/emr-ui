@@ -18,8 +18,8 @@ const RegisterPatient = () => {
   const location = useLocation();
   const bookedDetails = location.state?.bookedDetails;
   const surgeryPatientData = location.state?.patientData;
-  const schedulePatientData = location.state?.rowData;
-
+  const schedulePatientData = location.state?.data;
+  const selectedBed = location.state?.selectedBed;
   // console.log("schedulePatientData", schedulePatientData);
 
   const [showPatientInfo, setShowPatientInfo] = useState(false);
@@ -27,6 +27,8 @@ const RegisterPatient = () => {
 
   const { loading, error } = useSelector((state) => state.regPatient);
   const { registerPatientData } = useSelector((state) => state.regPatient);
+  console.log("patient data", registerPatientData?.patientDetail);
+
   const { doctorData } = useSelector((state) => state?.allDoctor);
 
   const allDoctorData = doctorData?.data || [];
@@ -56,44 +58,45 @@ const RegisterPatient = () => {
     phoneNumber: "",
     infoSource: "",
     address: "",
-    referralCase: "",
+    referralCase: "No",
     regDate: getCurrentDateTime(),
     age: "",
     email: "",
     nationalId: "",
-    workPhoneNumber: "",
-    language: "",
+    workPhoneno: "",
+    language: "English",
     religion: "",
     referredBy: "",
-    patientType: "",
-    patientPriority: "",
+    patientType: "Normal",
+    patientPriority: "Normal",
     maritalStatus: "",
+    otherIdName:"",
     otherId: "",
     landPhone: "",
     occupation: "",
     place: "",
     patientRemarks: "",
     speciality: "",
-    encounterType: "",
+    encounterType: "No Bed + No Emergency Room",
     doctorName: "",
-    paymentType: "",
+    paymentType: "Cash",
     subInsurance: "",
     networkType: "",
     insuranceCardNo: "",
-    insuranceEffDate: "",
+    insuranceEffectiveFrom: "",
     certificateNumber: "",
     maxInsuranceLiability: "",
     maxInsuranceCopay: "",
     extraCardNumber: "",
     insuranceExpireDate: "",
-    dependents: "",
+    dependentsNo: "",
     insuranceClaimNumber: "",
     insuranceApprovalLimit: "",
     copayPatient: "",
     admissionDate: "",
-    admissionTime: "",
+    // admissionTime: "",
     expectedDischargeDate: "",
-    expectedDischargeTime: "",
+    // expectedDischargeTime: "",
     admissionNote: "",
     ward: "",
     roomNo: "",
@@ -101,75 +104,103 @@ const RegisterPatient = () => {
     bedRate: "",
     accomodationNote: "",
   };
-  const [formData, setFormData] = useState({
-    // image: "",
-    visitType: surgeryPatientData ? "In Patient" : "" || "",
-    patientName:
-      bookedDetails?.patientName ||
-      surgeryPatientData?.patient ||
-      schedulePatientData?.patientName ||
-      "",
-    gender: "",
-    dob: "",
-    nationality: "",
-    visaType: "",
-    phoneNumber:
-      bookedDetails?.phoneNo ||
-      surgeryPatientData?.mobile ||
-      schedulePatientData?.mobile ||
-      "",
-    infoSource: "",
-    address: "",
-    referralCase: "",
-    regDate: getCurrentDateTime(),
-    age: "",
-    email: bookedDetails?.emailId || schedulePatientData?.emailId || "",
-    nationalId: "",
-    workPhoneNumber: "",
-    language: "",
-    religion: "",
-    referredBy: "",
-    patientType: "",
-    patientPriority: "",
-    maritalStatus: "",
-    otherIdName: "",
-    otherIdNo: "",
-    landPhone: "",
-    occupation: "",
-    place: "",
-    patientRemarks: "",
-    speciality: "",
-    encounterType: "",
-    doctorName:
-      surgeryPatientData?.doctor || schedulePatientData?.doctorName || "",
-    paymentType: "",
-    subInsurance: "",
-    networkType: "",
-    insuranceCardNo: "",
-    insuranceEffDate: "",
-    certificateNumber: "",
-    maxInsuranceLiability: "",
-    maxInsuranceCopay: "",
-    extraCardNumber: "",
-    insuranceExpireDate: "",
-    dependents: "",
-    insuranceClaimNumber: "",
-    insuranceApprovalLimit: "",
-    copayPatient: "",
-    existing: "no",
-    admissionDate: "",
-    admissionTime: "",
-    expectedDischargeDate: surgeryPatientData?.exp_discharge_date || "",
-    expectedDischargeTime: "",
-    admissionNote: "",
-    ward: surgeryPatientData?.ward || "",
-    roomNo: "",
-    bedNo: "",
-    bedRate: "",
-    accomodationNote: "",
-  });
+  const [formData, setFormData] = useState(() => {
+    const savedData = localStorage.getItem("registerPatientForm");
+    return savedData
+      ? JSON.parse(savedData)
+      : {
+          // image: "",
+          visitType:
+            surgeryPatientData || selectedBed ? "In Patient" : "" || "",
+          patientName:
+            bookedDetails?.patientName ||
+            surgeryPatientData?.patient ||
+            schedulePatientData?.patientName ||
+            "",
+          gender:
+            surgeryPatientData?.gender ||
+            schedulePatientData?.gender ||
+            bookedDetails?.gender ||
+            "",
+          dob:
+            surgeryPatientData?.dob ||
+            schedulePatientData?.dob ||
+            bookedDetails?.dob ||
+            "",
+          nationality: "",
+          visaType: "",
+          phoneNumber:
+            bookedDetails?.phoneNo ||
+            surgeryPatientData?.mobile ||
+            schedulePatientData?.mobile ||
+            "",
+          infoSource: "",
+          address: "",
+          referralCase: "No",
+          regDate: getCurrentDateTime(),
+          age:
+            surgeryPatientData?.age ||
+            schedulePatientData?.age ||
+            bookedDetails?.age ||
+            "",
+          email: bookedDetails?.emailId || schedulePatientData?.emailId || "",
+          nationalId: "",
+          workPhoneno: "",
+          language: "",
+          religion: "",
+          referredBy: "",
+          patientType: "Normal",
+          patientPriority: "Normal",
+          maritalStatus: "",
+          otherIdName: "",
+          otherId: "",
+          landPhone: "",
+          occupation: "",
+          place: "",
+          patientRemarks: "",
+          speciality: "",
+          encounterType: "No Bed + No Emergency Room",
+          doctorName:
+            surgeryPatientData?.doctor || schedulePatientData?.doctorName || "",
 
-  // Extract unique speciality names
+          paymentType: "Cash",
+          subInsurance: "",
+          networkType: "",
+          insuranceCardNo: "",
+          insuranceEffectiveFrom: "",
+          certificateNumber: "",
+          maxInsuranceLiability: "",
+          maxInsuranceCopay: "",
+          extraCardNumber: "",
+          insuranceExpireDate: "",
+          dependentsNo: "",
+          insuranceClaimNumber: "",
+          insuranceApprovalLimit: "",
+          copayPatient: "",
+          admissionDate: "",
+          // admissionTime: "",
+          expectedDischargeDate: surgeryPatientData?.exp_discharge_date || "",
+          // expectedDischargeTime: "",
+          admissionNote: "",
+          ward: surgeryPatientData?.ward || selectedBed?.wardName || "",
+          roomNo: selectedBed?.roomNoOrName || "",
+          bedNo: selectedBed?.bedNo || "",
+          bedRate: selectedBed?.rate || 0,
+          accomodationNote: "",
+        };
+  });
+  useEffect(() => {
+    if (selectedBed) {
+      setFormData((prev) => ({
+        ...prev,
+        ward: selectedBed.wardName || prev.ward,
+        roomNo: selectedBed.roomNoOrName || prev.roomNo,
+        bedNo: selectedBed.bedNo || prev.bedNo,
+        bedRate: selectedBed.rate || prev.bedRate,
+      }));
+    }
+  }, [selectedBed]);
+  // Populate Speciality Dropdown
   useEffect(() => {
     const specialities = [
       ...new Set(allDoctorData.map((doctor) => doctor.specialityName)),
@@ -178,7 +209,7 @@ const RegisterPatient = () => {
     setSpecialityOptions(specialities);
   }, [allDoctorData]);
 
-  // Filter doctors based on selected speciality
+  // Populate Doctor Dropdown when Speciality Changes
   useEffect(() => {
     if (formData.speciality) {
       const filteredDoctors = allDoctorData
@@ -194,12 +225,42 @@ const RegisterPatient = () => {
     }
   }, [formData.speciality, allDoctorData]);
 
+  // Auto-Fill Speciality Based on `bookedDetails.specialityId`
+  useEffect(() => {
+    if (bookedDetails?.specialityId) {
+      const speciality = allDoctorData.find(
+        (doc) => doc.specialityId === bookedDetails.specialityId
+      )?.specialityName;
+
+      if (speciality) {
+        setFormData((prev) => ({ ...prev, speciality }));
+      }
+    }
+  }, [bookedDetails, allDoctorData]);
+
+  // Auto-Fill Doctor AFTER `doctorOptions` is Populated
+  useEffect(() => {
+    if (bookedDetails?.doctorId && doctorOptions.length > 0) {
+      const selectedDoctor = doctorOptions.find(
+        (doc) => doc.value === bookedDetails.doctorId
+      );
+
+      if (selectedDoctor) {
+        setFormData((prev) => ({
+          ...prev,
+          doctorId: bookedDetails.doctorId,
+          doctorName: selectedDoctor.label,
+        }));
+      }
+    }
+  }, [doctorOptions, bookedDetails]);
+
   const handleInputChange = (field, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-      // ...(field === "speciality" && { doctorName: "" }),
-    }));
+    setFormData((prevData) => {
+      const updatedData = { ...prevData, [field]: value };
+      localStorage.setItem("registerPatientForm", JSON.stringify(updatedData));
+      return updatedData;
+    });
   };
 
   const registerPatient = () => {
@@ -216,7 +277,6 @@ const RegisterPatient = () => {
       "nationalId",
       "patientPriority",
       "gender",
-      // "otherId",
       "maritalStatus",
       "occupation",
       "speciality",
@@ -224,7 +284,9 @@ const RegisterPatient = () => {
       "paymentType",
       "encounterType",
     ];
+
     const missingFields = requiredFields.filter((field) => !formData[field]);
+
     if (missingFields.length > 0) {
       showToast(
         <div>
@@ -239,14 +301,58 @@ const RegisterPatient = () => {
       );
       return;
     }
-    dispatch(registerPatients(formData)).then(() => {
-      setFormData(initialState);
+    // Find the `specialityId` based on the selected `speciality`
+    const selectedSpeciality = allDoctorData.find(
+      (doc) => doc.specialityName === formData.speciality
+    )?.specialityId;
+
+    // Find the `doctorId` based on the selected `doctorName`
+    const selectedDoctor = doctorOptions.find(
+      (doc) => doc.label === formData.doctorName
+    )?.value;
+    // Exclude specific fields from the payload
+    const {
+      regDate,
+      ward,
+      roomNo,
+      bedNo,
+      bedRate,
+      speciality,
+      doctorName,
+      ...payload
+    } = formData;
+
+    const finalPayload = {
+      ...payload,
+      specialityId: selectedSpeciality || "",
+      doctorId: selectedDoctor || "",
+      bedId: selectedBed?.bedId || "",
+    };
+
+    dispatch(registerPatients(finalPayload)).then(() => {
+      // Clear localStorage after successful registration
+      localStorage.removeItem("registerPatientForm");
+
+      setFormData((prev) => ({
+        ...initialState,
+        regDate: prev.regDate,
+        ward: prev.ward,
+        roomNo: prev.roomNo,
+        bedNo: prev.bedNo,
+        bedRate: prev.bedRate,
+        speciality: prev.speciality,
+        doctorName: prev.doctorName,
+      }));
+
+      setShowPatientInfo(true);
     });
   };
+
+  // Update patientData when Redux state changes
   useEffect(() => {
-    if (registerPatientData?.statusCode === 200) {
-      setShowPatientInfo(true);
-      setPatientData(registerPatientData?.data);
+    if (registerPatientData?.patientDetail) {
+      setPatientData(registerPatientData.patientDetail);
+      console.log("Updated Patient Data:", registerPatientData.patientDetail);
     } else if (error) {
       showToast("Something went wrong!!", "error");
     }
@@ -402,10 +508,8 @@ const RegisterPatient = () => {
               />
               <FormInput
                 label={"Phone Number (Work)"}
-                value={formData.workPhoneNumber}
-                onChange={(value) =>
-                  handleInputChange("workPhoneNumber", value)
-                }
+                value={formData.workPhoneno}
+                onChange={(value) => handleInputChange("workPhoneno", value)}
               />
               <FormInput
                 label={"Preferred Language"}
@@ -442,8 +546,8 @@ const RegisterPatient = () => {
               <FormInput
                 label={"Other ID No"}
                 // required={true}
-                value={formData.otherIdNo}
-                onChange={(value) => handleInputChange("otherIdNo", value)}
+                value={formData.otherId}
+                onChange={(value) => handleInputChange("otherId", value)}
               />
               <FormInput
                 label={"Land Phone"}
@@ -509,37 +613,37 @@ const RegisterPatient = () => {
               </div>
               <Box className="form-details-section mb-4">
                 <FormInput
-                  label={"Admission date"}
-                  type="date"
+                  label={"Admission Date & Time"}
+                  type="datetime-local"
                   value={formData.admissionDate}
                   onChange={(value) =>
                     handleInputChange("admissionDate", value)
                   }
                 />
-                <FormInput
+                {/* <FormInput
                   label={"Admission time"}
                   type="time"
                   value={formData.admissionTime}
                   onChange={(value) =>
                     handleInputChange("admissionTime", value)
                   }
-                />
+                /> */}
                 <FormInput
-                  label={"Expected Discharge date"}
-                  type="date"
+                  label={"Expected Discharge Date & Time"}
+                  type="datetime-local"
                   value={formData.expectedDischargeDate}
                   onChange={(value) =>
                     handleInputChange("expectedDischargeDate", value)
                   }
                 />
-                <FormInput
+                {/* <FormInput
                   label={"Expected Discharge time"}
                   type="time"
                   value={formData.expectedDischargeTime}
                   onChange={(value) =>
                     handleInputChange("expectedDischargeTime", value)
                   }
-                />
+                /> */}
                 <FormInput
                   label={"Encounter Type"}
                   type="select"
@@ -567,7 +671,9 @@ const RegisterPatient = () => {
                 style={{ justifyContent: "space-between" }}
               >
                 <p className="text-dark header">Accomodation details</p>
-                <Link>Select Bed and Ward</Link>
+                <Link to="/secure/bedandward?tab=bed-occupancy">
+                  Select Bed and Ward
+                </Link>
               </div>
               <Box className="form-details-section mb-4">
                 <FormInput
@@ -597,9 +703,9 @@ const RegisterPatient = () => {
                     handleInputChange("accomodationNote", value)
                   }
                 />
-                <div>
+                {/* <div>
                   <Button>Admit</Button>
-                </div>
+                </div> */}
               </Box>
             </Box>
           )}
@@ -644,9 +750,9 @@ const RegisterPatient = () => {
                 <FormInput
                   label={"Insurance Effective From"}
                   type="date"
-                  value={formData.insuranceEffDate}
+                  value={formData.insuranceEffectiveFrom}
                   onChange={(value) =>
-                    handleInputChange("insuranceEffDate", value)
+                    handleInputChange("insuranceEffectiveFrom", value)
                   }
                 />
                 <FormInput
@@ -687,9 +793,9 @@ const RegisterPatient = () => {
                   }
                 />
                 <FormInput
-                  label={"Dependents No"}
-                  value={formData.dependents}
-                  onChange={(value) => handleInputChange("dependents", value)}
+                  label={"dependentsNo No"}
+                  value={formData.dependentsNo}
+                  onChange={(value) => handleInputChange("dependentsNo", value)}
                 />
                 <FormInput
                   label={"Insurance Claim No"}

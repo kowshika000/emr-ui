@@ -71,6 +71,9 @@ const EventDisplayComponent = ({
             phoneNo: slot.phoneNo || "--",
             mrdNo: slot.mrdNo || null,
             notes: slot.notes || "--",
+            gender: slot.gender || "--",
+            dob: slot.dob || "--",
+            age: slot.age || "--",
           });
         });
       });
@@ -81,6 +84,7 @@ const EventDisplayComponent = ({
     Object.entries(groupedBookings).forEach(([timeKey, bookingGroups]) => {
       Object.entries(bookingGroups).forEach(([bookingKey, slots]) => {
         const firstSlot = slots[0];
+        console.log("slot", firstSlot);
 
         bookedEvents.push({
           title: (
@@ -122,9 +126,19 @@ const EventDisplayComponent = ({
                     >
                       <IconButton
                         onClick={() =>
-                          navigate("/secure/registration", {
-                            state: { bookedDetails: firstSlot },
-                          })
+                          firstSlot.mrdNo
+                            ? navigate(
+                                "/secure/registration?tab=revist_registration",
+                                {
+                                  state: { bookedDetails: firstSlot },
+                                }
+                              )
+                            : navigate(
+                                "/secure/registration?tab=register_patient",
+                                {
+                                  state: { bookedDetails: firstSlot },
+                                }
+                              )
                         }
                         sx={{ padding: "2px", color: "green" }}
                       >

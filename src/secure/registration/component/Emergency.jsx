@@ -17,8 +17,7 @@ const Emergency = () => {
   };
 
   const [formData, setFormData] = useState({
-    visitType: "",
-    mrdNumber: "",
+    // mrdNumber: "",
     patientName: "",
     dob: "",
     nationality: "",
@@ -29,11 +28,11 @@ const Emergency = () => {
     age: "",
     email: "",
     nationalId: "",
-    workPhoneNo: "",
+    // workPhoneNo: "",
     language: "",
-    patientType: "",
-    otherIdName: "",
-    otherIdNo: "",
+    // patientType: "",
+    // otherIdName: "",
+    // otherIdNo: "",
     landPhone: "",
     speciality: "",
     encounterType: "",
@@ -181,14 +180,14 @@ const Emergency = () => {
               value={formData.language}
               onChange={(value) => handleInputChange("language", value)}
             />
-            <FormInput
+            {/* <FormInput
               label={"Patient Type"}
               type="select"
               options={OPTION.patientTypeOptions}
               value={formData.patientType}
               onChange={(value) => handleInputChange("patientType", value)}
-            />
-            <FormInput
+            /> */}
+            {/* <FormInput
               label={"Other ID Name"}
               type="select"
               options={OPTION.otherIdOptions}
@@ -200,7 +199,7 @@ const Emergency = () => {
               // required={true}
               value={formData.otherIdNo}
               onChange={(value) => handleInputChange("otherIdNo", value)}
-            />
+            /> */}
             <FormInput
               label={"Land Phone"}
               value={formData.landPhone}
