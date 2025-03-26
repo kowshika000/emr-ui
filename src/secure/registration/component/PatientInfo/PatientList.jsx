@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Input, Select, DatePicker } from "antd";
 import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
+import { patientList } from "../../../../Redux/slice/registration/patientList";
 
 const { Option } = Select;
 
 const PatientList = () => {
+  const dispatch = useDispatch();
+  const { data } = useSelector((state) => state.todayPatientList);
   const [filter, setFilter] = useState({});
   const [statusFilter, setStatusFilter] = useState("--All--");
+
+  console.log("data", data);
 
   const handleFilterChange = (columnId, value, type) => {
     if (type === "select") {
@@ -16,25 +22,33 @@ const PatientList = () => {
   };
 
   const handleDateChange = (columnId, date) => {
-    let value = date ? moment(date).format("DD/MM/YYYY") : "";
+    let value = date ? moment(date).format("YYYY-MM-DD") : "";
     setFilter({ ...filter, [columnId]: value });
   };
+
+  useEffect(() => {
+    dispatch(patientList());
+  }, []);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
 
   const columns = [
     {
       title: "S.No",
-      dataIndex: "s_no",
-      key: "s_no",
+      dataIndex: "sno",
+      key: "sno",
+      render: (_, __, index) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
     },
     {
       title: "Registration Date",
-      dataIndex: "patient_type",
-      key: "patient_type",
+      dataIndex: "registrationDate",
+      key: "registrationDate",
+      render: (text) => (text ? moment(text).format("YYYY-MM-DD") : "--"),
     },
     {
       title: "MRD Number",
-      dataIndex: "mr_number",
-      key: "mr_number",
+      dataIndex: "mrdNo",
+      key: "mrdNo",
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
         <Input
           value={selectedKeys[0]}
@@ -51,8 +65,8 @@ const PatientList = () => {
     },
     {
       title: "Patient Name",
-      dataIndex: "patient_name",
-      key: "patient_name",
+      dataIndex: "patientName",
+      key: "patientName",
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
         <Input
           value={selectedKeys[0]}
@@ -69,18 +83,19 @@ const PatientList = () => {
     },
     {
       title: "DOB",
-      dataIndex: "doctor",
-      key: "doctor",
+      dataIndex: "dob",
+      key: "dob",
+      render: (text) => (text ? moment(text).format("YYYY-MM-DD") : "--"),
     },
     {
       title: "Gender",
-      dataIndex: "recall_date",
-      key: "recall_date",
+      dataIndex: "gender",
+      key: "gender",
     },
     {
       title: "Nationality",
-      dataIndex: "Plan_of_care",
-      key: "Plan_of_care",
+      dataIndex: "nationality",
+      key: "nationality",
     },
     {
       title: "Status",
@@ -110,16 +125,19 @@ const PatientList = () => {
     },
   ];
 
-  const data = []; // Add your patient data here
-
   return (
     <div>
       <Table
         className="table-container"
         columns={columns}
-        dataSource={data}
-        rowKey={(record) => record.s_no}
-        pagination={{ pageSize: 10 }}
+        dataSource={data || []}
+        rowKey={(record, index) => index}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          onChange: (page, pageSize) =>
+            setPagination({ current: page, pageSize }),
+        }}
       />
     </div>
   );

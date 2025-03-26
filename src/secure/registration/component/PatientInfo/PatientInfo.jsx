@@ -28,27 +28,32 @@ export const PatientInfo = ({ patientData, setShowPatientInfo }) => {
       >
         {[
           { label: "MRD No", value: patientData?.mrdNo },
-          { label: "Patient Name", value: patientData?.patientName },
-          { label: "Date of Birth", value: patientData?.dob },
           { label: "Visit Type", value: patientData?.visitType },
+          { label: "Reg Date", value: patientData?.createdOn },
+
+          { label: "Patient Name", value: patientData?.name },
+          { label: "Date of Birth", value: patientData?.dob },
+          { label: "Age", value: patientData?.age },
+          { label: "Email ID", value: patientData?.emailId },
+          { label: "Phone Number", value: patientData?.phoneNo },
+          { label: "Gender", value: patientData?.gender },
+
           { label: "Nationality", value: patientData?.nationality },
+          { label: "National ID", value: patientData?.nationalId },
+
           { label: "Visa Type", value: patientData?.visaType },
-          { label: "Phone Number", value: patientData?.phoneNumber },
           { label: "Info Source", value: patientData?.infoSource },
           { label: "Address", value: patientData?.address },
           { label: "Referral Case", value: patientData?.referralCase },
-          { label: "Reg Date", value: patientData?.regDate },
-          { label: "Age", value: patientData?.age },
-          { label: "Email ID", value: patientData?.email },
-          { label: "National ID", value: patientData?.nationalId },
-          { label: "Phone Number (Work)", value: patientData?.workPhoneNumber },
+
+          { label: "Phone Number (Work)", value: patientData?.workPhoneno },
           { label: "Preferred Language", value: patientData?.language },
           { label: "Religion", value: patientData?.religion },
           { label: "Referred By", value: patientData?.referredBy },
           { label: "Patient Type", value: patientData?.patientType },
           { label: "Patient Priority", value: patientData?.patientPriority },
-          { label: "Gender", value: patientData?.gender },
           { label: "Marital Status", value: patientData?.maritalStatus },
+          { label: "Other ID Name", value: patientData?.otherIdName },
           { label: "Other ID", value: patientData?.otherId },
           { label: "Land Phone", value: patientData?.landPhone },
           { label: "Occupation", value: patientData?.occupation },
@@ -62,7 +67,11 @@ export const PatientInfo = ({ patientData, setShowPatientInfo }) => {
             flexDirection={"column"}
           >
             <div style={{ color: "rgb(142, 150, 150)" }}>{label}</div>{" "}
-            <div> {value ?? "--"}</div>
+            <div>
+              {value !== "" && value !== undefined && value !== null
+                ? value
+                : "--"}
+            </div>
           </Box>
         ))}
       </Box>

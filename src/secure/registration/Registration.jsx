@@ -6,12 +6,6 @@ import EMRtabs from "../../components/global/EMRtabs";
 import RegisterPatient from "./component/RegisterPatient";
 import Emergency from "./component/Emergency";
 import Revisit from "./component/Revisit";
-import ScheduleList from "../dashboard/components/ScheduleList";
-import PatientRecall from "../dashboard/components/PatientRecall";
-import PatientVaccinationSchedule from "../dashboard/components/PatientVaccinationSchedules";
-import VaccinesIcon from "@mui/icons-material/Vaccines";
-import EventNoteIcon from "@mui/icons-material/EventNote";
-import EventRepeatIcon from "@mui/icons-material/EventRepeat";
 import PatientList from "./component/PatientInfo/PatientList";
 
 const Registration = () => {
@@ -32,13 +26,6 @@ const Registration = () => {
       value: "patient_list",
       icon: "",
     },
-    // { name: "Schedule List", value: "schedule_list", icon: EventNoteIcon },
-    // { name: "Patient Recall", value: "patient_recall", icon: EventRepeatIcon },
-    // {
-    //   name: "Patient Vaccination Schedules",
-    //   value: "patient_vaccination_schedules",
-    //   icon: VaccinesIcon,
-    // },
   ];
 
   useEffect(() => {
