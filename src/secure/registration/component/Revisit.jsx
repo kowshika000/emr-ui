@@ -6,15 +6,19 @@ import { searchPatients } from "../../../Redux/slice/appointement/searchPatientS
 import FormInput from "../../../components/FormFields/FormInput";
 import { DropdownOptions } from "../../../components/FormFields/DropdownOptions";
 import { revisitPatients } from "../../../Redux/slice/registration/revisitSlice";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { PatientInfo } from "./PatientInfo/PatientInfo";
 import { showToast } from "../../../components/global/Toast";
 
 const Revisit = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+
   const surgeryPatientData = location.state?.patientData;
   const schedulePatientData = location.state?.data;
   const bookedDetailsData = location.state?.bookedDetails;
+  const selectedBed = location.state?.selectedBed;
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
 
@@ -23,11 +27,12 @@ const Revisit = () => {
 
   const OPTION = DropdownOptions;
 
-  const dispatch = useDispatch();
   const { searchPatientData } = useSelector((state) => state.searchPatient);
   const { data, loading, error } = useSelector((state) => state?.revisit);
 
-  const patientId = selectedPatient?.patientId;
+  const patientId =
+    selectedPatient?.patientId || schedulePatientData?.patientId;
+  console.log("patient id slot", patientId);
 
   const [specialityOptions, setSpecialityOptions] = useState([]);
   const [doctorOptions, setDoctorOptions] = useState([]);
@@ -46,6 +51,7 @@ const Revisit = () => {
   };
 
   const [formData, setFormData] = useState({
+    visitType: "",
     mrdNumber:
       surgeryPatientData?.mr_no ||
       schedulePatientData?.mrdNo ||
@@ -81,7 +87,7 @@ const Revisit = () => {
     nationalId:
       surgeryPatientData?.nationalId || schedulePatientData?.nationalId || "",
     visaType:
-      surgeryPatientData?.visaType || schedulePatientData?.visaType || "",
+      surgeryPatientData?.visaType || schedulePatientData?.visatype || "",
     speciality: "",
     encounterType: "",
     doctorName: "",
@@ -99,6 +105,14 @@ const Revisit = () => {
     insuranceClaimNumber: "",
     insuranceApprovalLimit: "",
     copayPatient: "",
+    admissionDate: "",
+    expectedDischargeDate: surgeryPatientData?.exp_discharge_date || "",
+    admissionNote: "",
+    ward: surgeryPatientData?.ward || selectedBed?.wardName || "",
+    roomNo: selectedBed?.roomNoOrName || "",
+    bedNo: selectedBed?.bedNo || "",
+    bedRate: selectedBed?.rate || 0,
+    accomodationNote: "",
   });
 
   // Populate Speciality Dropdown
@@ -128,33 +142,54 @@ const Revisit = () => {
 
   // Auto-Fill Speciality Based on `bookedDetails.specialityId`
   useEffect(() => {
-    if (bookedDetailsData?.specialityId) {
+    const specialityId =
+      bookedDetailsData?.specialityId ||
+      surgeryPatientData?.specialityId ||
+      schedulePatientData?.specialityId;
+
+    if (specialityId) {
       const speciality = allDoctorData.find(
-        (doc) => doc.specialityId === bookedDetailsData.specialityId
+        (doc) => doc.specialityId === specialityId
       )?.specialityName;
 
       if (speciality) {
         setFormData((prev) => ({ ...prev, speciality }));
       }
     }
-  }, [bookedDetailsData, allDoctorData]);
+  }, [
+    bookedDetailsData,
+    surgeryPatientData,
+    schedulePatientData,
+    allDoctorData,
+  ]);
 
   // Auto-Fill Doctor AFTER `doctorOptions` is Populated
   useEffect(() => {
-    if (bookedDetailsData?.doctorId && doctorOptions.length > 0) {
+    const doctorId =
+      bookedDetailsData?.doctorId ||
+      surgeryPatientData?.doctorId ||
+      schedulePatientData?.doctorId;
+
+    if (doctorId && doctorOptions.length > 0) {
       const selectedDoctor = doctorOptions.find(
-        (doc) => doc.value === bookedDetailsData.doctorId
+        (doc) => doc.value === doctorId
       );
 
       if (selectedDoctor) {
         setFormData((prev) => ({
           ...prev,
-          doctorId: bookedDetailsData.doctorId,
+          doctorId,
           doctorName: selectedDoctor.label,
         }));
       }
     }
-  }, [doctorOptions, bookedDetailsData]);
+  }, [
+    doctorOptions,
+    bookedDetailsData,
+    surgeryPatientData,
+    schedulePatientData,
+  ]);
+
   useEffect(() => {
     if (selectedPatient) {
       setFormData((prevData) => ({
@@ -208,38 +243,61 @@ const Revisit = () => {
       );
       return;
     }
-    dispatch(revisitPatients({ credentials: formData, patientId })).then(() => {
-      setFormData((prevData) => ({
-        ...prevData,
-        mrdNumber: "",
-        dob: "",
-        gender: "",
-        phoneNumber: "",
-        patientName: "",
-        age: "",
-        nationality: "",
-        nationalId: "",
-        visaType: "",
-        speciality: "",
-        encounterType: "",
-        doctorName: "",
-        paymentType: "",
-        subInsurance: "",
-        networkType: "",
-        insuranceCardNo: "",
-        insuranceEffectiveFrom: "",
-        certificateNumber: "",
-        maxInsuranceLiability: "",
-        maxInsuranceCopay: "",
-        extraCardNumber: "",
-        insuranceExpireDate: "",
-        dependentsNo: "",
-        insuranceClaimNumber: "",
-        insuranceApprovalLimit: "",
-        copayPatient: "",
-      }));
-      setShowPatientInfo(true);
-    });
+    const {
+      visitType,
+      admissionDate,
+      expectedDischargeDate,
+      admissionNote,
+      ward,
+      roomNo,
+      bedNo,
+      bedRate,
+      accomodationNote,
+      ...cleanFormData
+    } = formData;
+    dispatch(revisitPatients({ credentials: cleanFormData, patientId })).then(
+      () => {
+        setFormData((prevData) => ({
+          ...prevData,
+          visitType: "",
+          mrdNumber: "",
+          dob: "",
+          gender: "",
+          phoneNumber: "",
+          patientName: "",
+          age: "",
+          nationality: "",
+          nationalId: "",
+          visaType: "",
+          speciality: "",
+          encounterType: "",
+          doctorName: "",
+          paymentType: "",
+          subInsurance: "",
+          networkType: "",
+          insuranceCardNo: "",
+          insuranceEffectiveFrom: "",
+          certificateNumber: "",
+          maxInsuranceLiability: "",
+          maxInsuranceCopay: "",
+          extraCardNumber: "",
+          insuranceExpireDate: "",
+          dependentsNo: "",
+          insuranceClaimNumber: "",
+          insuranceApprovalLimit: "",
+          copayPatient: "",
+          admissionDate: "",
+          expectedDischargeDate: "",
+          admissionNote: "",
+          ward: "",
+          roomNo: "",
+          bedNo: "",
+          bedRate: 0,
+          accomodationNote: "",
+        }));
+        setShowPatientInfo(true);
+      }
+    );
   };
 
   useEffect(() => {
@@ -286,6 +344,14 @@ const Revisit = () => {
                 <p className="text-dark header">Patient Demographic Details</p>
               </div>
               <Box className="form-details-section">
+                <FormInput
+                  label={"Visit Type"}
+                  required={true}
+                  type="select"
+                  options={OPTION.visitOptions}
+                  value={formData.visitType}
+                  onChange={(value) => handleInputChange("visitType", value)}
+                />
                 <FormInput
                   label={"MRD Number"}
                   value={formData.mrdNumber}
@@ -373,18 +439,111 @@ const Revisit = () => {
                   value={formData.doctorName}
                   onChange={(value) => handleInputChange("doctorName", value)}
                 />
-                <FormInput
-                  label={"Encounter Type"}
-                  required={true}
-                  type="select"
-                  options={OPTION.encounterTypeOptions}
-                  value={formData.encounterType}
-                  onChange={(value) =>
-                    handleInputChange("encounterType", value)
-                  }
-                />
+                {formData.visitType === "In Patient" ? (
+                  ""
+                ) : (
+                  <FormInput
+                    label={"Encounter Type"}
+                    required={true}
+                    type="select"
+                    options={OPTION.encounterTypeOptions}
+                    value={formData.encounterType}
+                    onChange={(value) =>
+                      handleInputChange("encounterType", value)
+                    }
+                  />
+                )}
               </Box>
             </Box>
+
+            {formData.visitType === "In Patient" && (
+              <Box p={1} width={"100%"}>
+                <div>
+                  <p className="text-dark header">Admission Details</p>
+                </div>
+                <Box className="form-details-section mb-4">
+                  <FormInput
+                    label={"Admission Date & Time"}
+                    type="datetime-local"
+                    value={formData.admissionDate}
+                    onChange={(value) =>
+                      handleInputChange("admissionDate", value)
+                    }
+                  />
+                  <FormInput
+                    label={"Expected Discharge Date & Time"}
+                    type="datetime-local"
+                    value={formData.expectedDischargeDate}
+                    onChange={(value) =>
+                      handleInputChange("expectedDischargeDate", value)
+                    }
+                  />
+                  <FormInput
+                    label={"Encounter Type"}
+                    type="select"
+                    value={formData.encounterType}
+                    options={OPTION.ipEncounterTypeOptions}
+                    onChange={(value) =>
+                      handleInputChange("encounterType", value)
+                    }
+                  />
+                  <FormInput
+                    label={"Notes"}
+                    value={formData.admissionNote}
+                    onChange={(value) =>
+                      handleInputChange("admissionNote", value)
+                    }
+                  />
+                </Box>
+              </Box>
+            )}
+
+            {formData.visitType === "In Patient" && (
+              <Box p={1} width={"100%"}>
+                <div
+                  className="d-flex "
+                  style={{ justifyContent: "space-between" }}
+                >
+                  <p className="text-dark header">Accomodation details</p>
+                  <Link
+                    to="/secure/bedandward?tab=bed-occupancy"
+                    state={{ fromTab: "revist_registration" }}
+                  >
+                    Select Bed and Ward
+                  </Link>
+                </div>
+                <Box className="form-details-section mb-4">
+                  <FormInput
+                    label={"Ward"}
+                    value={formData.ward}
+                    onChange={(value) => handleInputChange("ward", value)}
+                  />
+                  <FormInput
+                    label={"Room No"}
+                    value={formData.roomNo}
+                    onChange={(value) => handleInputChange("roomNo", value)}
+                  />
+                  <FormInput
+                    label={"Bed No"}
+                    value={formData.bedNo}
+                    onChange={(value) => handleInputChange("bedNo", value)}
+                  />
+                  <FormInput
+                    label={"Bed Rate"}
+                    value={formData.bedRate}
+                    onChange={(value) => handleInputChange("bedRate", value)}
+                  />
+                  <FormInput
+                    label={"Notes"}
+                    value={formData.accomodationNote}
+                    onChange={(value) =>
+                      handleInputChange("accomodationNote", value)
+                    }
+                  />
+                </Box>
+              </Box>
+            )}
+
             <Box p={1} width={"100%"}>
               <div>
                 <p className="text-dark header">Payment Details</p>

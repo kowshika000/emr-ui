@@ -1,5 +1,7 @@
 import React from "react";
-import { CircularProgress, Box } from "@mui/material";
+import { Box } from "@mui/material";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../assets/Animation.json";
 
 const Loading = () => {
   return (
@@ -12,7 +14,12 @@ const Loading = () => {
         width: "100%",
       }}
     >
-      <CircularProgress />
+      <Lottie
+        animationData={loadingAnimation}
+        loop
+        autoplay
+        style={{ width: 150, height: 150 }}
+      />
     </Box>
   );
 };

@@ -42,3 +42,25 @@ const allAppointmentSlice = createSlice({
 });
 
 export default allAppointmentSlice.reducer;
+
+export const updateBookedSlot = createAsyncThunk(
+  "docAvailable/updateSlot",
+  async (
+    { appointmentId, doctorId, newTime, newDate },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axiosInstance.put(
+        `/appointments/${appointmentId}/reschedule`,
+        {
+          doctorId,
+          newTime,
+          newDate,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);

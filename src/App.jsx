@@ -47,6 +47,15 @@ const App = () => {
       .catch((error) =>
         console.error("Failed to load bedAndWardReducer:", error)
       );
+      
+    import("emr_doctor/docEmrReducer")
+      .then(({ default: docEmrReducer }) => {
+        console.log("docEmrReducer Loaded:", docEmrReducer);
+        if (store.injectReducer) {
+          store.injectReducer("docEmr", docEmrReducer);
+        }
+      })
+      .catch((error) => console.error("Failed to load docEmrReducer:", error));
   }, []);
 
   return (

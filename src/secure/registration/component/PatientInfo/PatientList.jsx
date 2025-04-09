@@ -46,6 +46,26 @@ const PatientList = () => {
       render: (text) => (text ? moment(text).format("YYYY-MM-DD") : "--"),
     },
     {
+      title: "Visit Type",
+      dataIndex: "vistType",
+      key: "vistType",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <Select
+          value={selectedKeys[0]}
+          onChange={(value) => {
+            setSelectedKeys(value ? [value] : []);
+            confirm();
+          }}
+          style={{ width: "100%" }}
+        >
+          <Option value="">--All--</Option>
+          <Option value="In Patient">IP</Option>
+          <Option value="Out Patient">OP</Option>
+        </Select>
+      ),
+      onFilter: (value, record) => record.vistType === value,
+    },
+    {
       title: "MRD Number",
       dataIndex: "mrdNo",
       key: "mrdNo",
@@ -117,12 +137,12 @@ const PatientList = () => {
       ),
       onFilter: (value, record) => record.status === value,
     },
-    {
-      title: "Options",
-      dataIndex: "actions",
-      key: "actions",
-      render: (_, record) => <a href="#">Edit</a>,
-    },
+    // {
+    //   title: "Options",
+    //   dataIndex: "actions",
+    //   key: "actions",
+    //   render: (_, record) => <a href="#">Edit</a>,
+    // },
   ];
 
   return (

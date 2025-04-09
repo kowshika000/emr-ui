@@ -36,11 +36,6 @@ const FormInput = ({
     return date.toISOString().slice(0, 19).replace("T", " "); // Converts to YYYY-MM-DD HH:MM:SS
   };
 
-  const formatDateTimeInput = (dateTime) => {
-    if (!dateTime) return "";
-    return dateTime.replace("T", " "); // Converts to YYYY-MM-DD HH:MM:SS
-  };
-
   const handleBlur = () => {
     setError(required && !value);
   };

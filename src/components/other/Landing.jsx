@@ -62,7 +62,12 @@ const allModules = [
     path: "/secure/bedandward",
     color: "#A52A2A",
   },
-
+  {
+    name: "OT Booking",
+    icon: <FaProcedures />,
+    path: "/secure/ot",
+    color: "#FF6B6B",
+  },
   {
     name: "Laboratory",
     icon: <FaFlask />,
@@ -101,6 +106,8 @@ const Landing = () => {
         allowedModules = allModules.filter(
           (mod) => mod.name === "Billing" || mod.name === "Report"
         );
+      } else if (userRole === "Doctor") {
+        allowedModules = allModules.filter((mod) => mod.name === "Doctor EMR");
       } else {
         allowedModules = allModules;
       }

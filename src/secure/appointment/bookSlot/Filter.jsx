@@ -172,7 +172,7 @@ const Filter = () => {
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
             filteredDoctors={filteredDoctors}
-            slotDuration={15}
+            slotDuration={20}
             activeTab={activeTab}
             selectedSpeciality={selectedSpeciality}
           />

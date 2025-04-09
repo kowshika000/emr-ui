@@ -70,7 +70,7 @@ const RegisterPatient = () => {
     patientType: "Normal",
     patientPriority: "Normal",
     maritalStatus: "",
-    otherIdName:"",
+    otherIdName: "",
     otherId: "",
     landPhone: "",
     occupation: "",
@@ -143,7 +143,7 @@ const RegisterPatient = () => {
             schedulePatientData?.age ||
             bookedDetails?.age ||
             "",
-          email: bookedDetails?.emailId || schedulePatientData?.emailId || "",
+          email: bookedDetails?.email || schedulePatientData?.emailId || "",
           nationalId: "",
           workPhoneno: "",
           language: "",
@@ -311,16 +311,8 @@ const RegisterPatient = () => {
       (doc) => doc.label === formData.doctorName
     )?.value;
     // Exclude specific fields from the payload
-    const {
-      regDate,
-      ward,
-      roomNo,
-      bedNo,
-      bedRate,
-      speciality,
-      doctorName,
-      ...payload
-    } = formData;
+    const { ward, roomNo, bedNo, bedRate, speciality, doctorName, ...payload } =
+      formData;
 
     const finalPayload = {
       ...payload,
@@ -671,7 +663,10 @@ const RegisterPatient = () => {
                 style={{ justifyContent: "space-between" }}
               >
                 <p className="text-dark header">Accomodation details</p>
-                <Link to="/secure/bedandward?tab=bed-occupancy">
+                <Link
+                  to="/secure/bedandward?tab=bed-occupancy"
+                  state={{ fromTab: "register_patient" }}
+                >
                   Select Bed and Ward
                 </Link>
               </div>
