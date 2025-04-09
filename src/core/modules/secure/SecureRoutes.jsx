@@ -14,6 +14,7 @@ const BillingLandingModule = React.lazy(() =>
 );
 const BillingPageModule = React.lazy(() => import("emr_billing/BillingPage"));
 const IPEmrModule = React.lazy(() => import("emr_ip/IpHeaderTab"));
+const OtBookingModule = React.lazy(() => import("emr_ip/OtBooking"));
 const BedAndWardModule = React.lazy(() =>
   import("emr_bedAndWard/BedAndWardHeaderTab")
 );
@@ -23,7 +24,6 @@ const WardRoomDetail = React.lazy(() =>
 const DoctorEmrModule = React.lazy(() => import("emr_doctor/DoctorEmr"));
 const IPDetails = React.lazy(() => import("emr_doctor/IPDetails"));
 const OPDetails = React.lazy(() => import("emr_doctor/OPDetails"));
-// const LabMdl = React.lazy(() => import("emr_lab/LabHeaderTab"));
 const NurseModule = React.lazy(() => import("emr_nurse/Dashboard"));
 const NursePage = React.lazy(() => import("emr_nurse/Nurse"));
 const Labratory = React.lazy(() => import("emr_lab/HeaderTabs"));
@@ -47,6 +47,13 @@ const IPEmr = () => {
   return (
     <Suspense fallback={<Loading />}>
       <IPEmrModule />
+    </Suspense>
+  );
+};
+const Ot = () => {
+  return (
+    <Suspense fallback={<Loading />}>
+      <OtBookingModule />
     </Suspense>
   );
 };
@@ -112,8 +119,6 @@ const NursePages = () => {
   );
 };
 
-
-
 export const SECURE_ROUTES = [
   {
     path: "/secure",
@@ -127,12 +132,6 @@ export const SECURE_ROUTES = [
     secure: true,
     component: Landing,
   },
-  // {
-  //   path: `/secure/dashboard`,
-  //   exact: true,
-  //   secure: true,
-  //   component: Dashboard,
-  // },
   {
     path: `/secure/appointment`,
     exact: true,
@@ -162,6 +161,12 @@ export const SECURE_ROUTES = [
     exact: true,
     secure: true,
     component: IPEmr,
+  },
+  {
+    path: `/secure/ot`,
+    exact: true,
+    secure: true,
+    component: Ot,
   },
   {
     path: `/secure/bedandward`,

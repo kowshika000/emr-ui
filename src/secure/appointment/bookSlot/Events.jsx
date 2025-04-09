@@ -24,7 +24,7 @@ import Reschedule from "./modal/Reschedule";
 import { useNavigate } from "react-router-dom";
 
 const EventDisplayComponent = ({
-  slotDuration = 15,
+  slotDuration = 20,
   setEvents,
   getAvailableSlotsForAllDoctors,
 }) => {
@@ -74,6 +74,7 @@ const EventDisplayComponent = ({
             gender: slot.gender || "--",
             dob: slot.dob || "--",
             age: slot.age || "--",
+            email: slot.emailId || "--",
           });
         });
       });

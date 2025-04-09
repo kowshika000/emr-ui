@@ -9,6 +9,7 @@ import { showToast } from "../../../components/global/Toast";
 import NewEventModal from "../component/NewEvent";
 import EMRLoader from "../../../components/global/loader/EMRLoaderOverlay";
 import EventDisplayComponent from "./Events";
+import { reSchedule } from "../../../Redux/slice/appointement/reScheduleSlice";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -119,12 +120,12 @@ const CalendarView = ({
   const getAvailableSlotsForAllDoctors = useCallback(() => {
     if (selectedDate) {
       const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
-      const interval =
-        slotDuration === "60"
-          ? "SIXTY_MINUTES"
-          : slotDuration === "30"
-          ? "THIRTY_MINUTES"
-          : "FIFTEEN_MINUTES";
+      const interval = "TWENTY_MINUTES";
+      // slotDuration === "60"
+      //   ? "SIXTY_MINUTES"
+      //   : slotDuration === "30"
+      //   ? "THIRTY_MINUTES"
+      //   : "FIFTEEN_MINUTES";
 
       dispatch(doctorAvailability({ interval, date: formattedDate }));
     }
@@ -198,12 +199,49 @@ const CalendarView = ({
       marginTop: "5px",
       border: "none",
       outline: "none",
-      // border: "1px solid #000",
-      // padding: "5px",
-      // textAlign: "center",
-      // borderRadius: "4px",
     },
   });
+
+  const onEventDrop = async ({ event, start, end, resourceId }) => {
+    const newDateTime = moment(start);
+
+    // Prevent dropping events in the past
+    if (newDateTime.isBefore(moment(), "minute")) {
+      showToast(["You cannot move an appointment to a past time."], "error");
+      return;
+    }
+
+    const newDate = moment(start).format("YYYY-MM-DD");
+    const newTime = moment(start).format("HH:mm");
+
+    try {
+      await dispatch(
+        reSchedule({
+          appointmentId: event.appointmentId,
+          appointmentDate: newDate,
+          appointmentTime: newTime,
+          doctorId: resourceId,
+        })
+      ).unwrap();
+
+      setEvents((prevEvents) =>
+        prevEvents.map((ev) =>
+          ev.appointmentId === event.appointmentId
+            ? { ...ev, start, end, resourceId }
+            : ev
+        )
+      );
+
+      await getAvailableSlotsForAllDoctors();
+
+      showToast(["Appointment rescheduled successfully."], "success");
+    } catch (error) {
+      showToast(
+        [error?.message || "Failed to reschedule appointment."],
+        "error"
+      );
+    }
+  };
 
   return (
     <Box width="100%" overflow="auto">
@@ -238,6 +276,9 @@ const CalendarView = ({
         eventPropGetter={eventStyleGetter}
         slotPropGetter={customSlotPropGetter}
         scrollToTime={new Date(1970, 1, 1, 9, 0, 0)}
+        onEventDrop={onEventDrop}
+        draggableAccessor={() => true} // Enable drag-and-drop
+        resizableAccessor={() => false} // Disable resizing
       />
       {open && (
         <NewEventModal

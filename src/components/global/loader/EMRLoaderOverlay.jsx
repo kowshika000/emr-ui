@@ -1,6 +1,6 @@
 import React from "react";
-import { Modal } from "react-bootstrap";
-import { Spinner } from "react-bootstrap";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../../assets/AnimationLoad.json";
 import "./loader.css";
 
 const EMRLoader = ({ show }) => {
@@ -8,7 +8,12 @@ const EMRLoader = ({ show }) => {
     <>
       {show && (
         <div className="fullscreen-loader">
-          <Spinner style={{ color: "green" }} />
+          <Lottie
+            animationData={loadingAnimation}
+            loop
+            autoplay
+            style={{ width: 150, height: 150 }}
+          />
         </div>
       )}
     </>
@@ -16,3 +21,29 @@ const EMRLoader = ({ show }) => {
 };
 
 export default EMRLoader;
+
+// import React from "react";
+// import { Box } from "@mui/material";
+// import Lottie from "lottie-react";
+// import loadingAnimation from "../../../assets/Animation.json";
+
+// const EMRLoader = ({ show = true }) => {
+//   if (!show) return null;
+
+//   return (
+//     <Box className="fullscreen-loader">
+//       {loadingAnimation ? (
+//         <Lottie
+//           animationData={loadingAnimation}
+//           loop
+//           autoplay
+//           // style={{ width: 150, height: 150 }}
+//         />
+//       ) : (
+//         <span>Loading...</span>
+//       )}
+//     </Box>
+//   );
+// };
+
+// export default EMRLoader;

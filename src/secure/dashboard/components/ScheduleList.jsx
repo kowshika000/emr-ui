@@ -78,6 +78,7 @@ const ScheduleList = () => {
         />
       ),
     },
+
     {
       title: "MR Number",
       dataIndex: "mrdNo",
