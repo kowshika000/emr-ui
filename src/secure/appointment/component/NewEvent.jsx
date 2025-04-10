@@ -34,6 +34,7 @@ import { useDispatch } from "react-redux";
 import { searchPatients } from "../../../Redux/slice/appointement/searchPatientSlice";
 import { useSelector } from "react-redux";
 import { bookAppointment } from "../../../Redux/slice/appointement/bookAppointementSlice";
+import FormInput from "../../../components/FormFields/FormInput";
 // import FormInput from "../../../components/FormFields/FormInput";
 
 const NewEventModal = ({
@@ -265,11 +266,18 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
     setEventData(formData);
   }, [formData]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
+  // const handleChange = (e) => {
+  //   const { name, value, type, checked } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: type === "checkbox" ? checked : value,
+  //   }));
+  // };
+
+  const handleChange = (field, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
     }));
   };
 
@@ -289,195 +297,130 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
         gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))"
         gap={2}
       >
-        <TextField
-          select
-          fullWidth
-          value={formData.scheduleType}
-          onChange={handleChange}
+        <FormInput
+          type="select"
+          label="Schedule Type"
           name="scheduleType"
-          variant="outlined"
-          size="small"
-          label={
-            <>
-              Schedule Type <span style={{ color: "red" }}>*</span>
-            </>
-          }
-        >
-          <MenuItem value={"-1"}>Select...</MenuItem>
-          {ScheduleTypes.map((type) => (
-            <MenuItem key={type.type} value={type.type}>
-              {type.type}
-            </MenuItem>
-          ))}
-        </TextField>
+          value={formData.scheduleType}
+          onChange={(value) => handleChange("scheduleType", value)}
+          required
+          options={[
+            { label: "Select...", value: "-1" },
+            ...ScheduleTypes.map((type) => ({
+              label: type.type,
+              value: type.type,
+            })),
+          ]}
+        />
 
-        <TextField
-          select
-          fullWidth
-          value={formData.numberOfSlots}
-          onChange={(e) => handleChange(e, "input", true)}
-          name="numberOfSlots"
-          variant="outlined"
-          size="small"
+        <FormInput
+          type="select"
           label="No of Slots"
-        >
-          <MenuItem value={"-1"}>Select...</MenuItem>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
-            <MenuItem key={count} value={count}>
-              {count}
-            </MenuItem>
-          ))}
-        </TextField>
+          name="numberOfSlots"
+          value={formData.numberOfSlots}
+          onChange={(value) => handleChange("numberOfSlots", value)}
+          options={[
+            { label: "Select...", value: "-1" },
+            ...[1, 2, 3, 4, 5, 6, 7, 8].map((count) => ({
+              label: count,
+              value: count,
+            })),
+          ]}
+        />
 
-        <TextField
-          fullWidth
+        <FormInput
+          label="MRD No"
           name="mrdNo"
           value={formData.mrdNo}
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-          label="MRD No"
+          onChange={(value) => handleChange("mrdNo", value)}
         />
 
-        <TextField
-          fullWidth
+        <FormInput
+          label="Patient Name"
           name="patientName"
           value={formData.patientName}
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-          label={
-            <>
-              Patient Name <span style={{ color: "red" }}>*</span>
-            </>
-          }
+          onChange={(value) => handleChange("patientName", value)}
+          required
         />
 
-        <TextField
-          fullWidth
+        <FormInput
+          type="date"
+          label="Date of Birth"
           name="dob"
           value={formData.dob}
-          type="date"
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-          label={
-            <>
-              {" "}
-              Date of Birth <span style={{ color: "red" }}>*</span>
-            </>
+          onChange={(value) => handleChange("dob", value)}
+          setDependentValue={(calculatedAge) =>
+            handleChange("age", calculatedAge)
           }
-          InputLabelProps={{ shrink: true }}
+          required
         />
 
-        <TextField
-          fullWidth
+        <FormInput
+          type="number"
+          label="Age"
           name="age"
           value={formData.age}
-          type="number"
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-          label={
-            <>
-              {" "}
-              Age <span style={{ color: "red" }}>*</span>
-            </>
-          }
+          onChange={(value) => handleChange("age", value)}
+          required
         />
 
-        <TextField
-          select
-          fullWidth
+        <FormInput
+          type="select"
+          label="Gender"
           name="gender"
           value={formData.gender}
-          onChange={(e) => handleChange(e, "input", true)}
-          variant="outlined"
-          size="small"
-          label={
-            <>
-              {" "}
-              Gender <span style={{ color: "red" }}>*</span>
-            </>
-          }
-        >
-          <MenuItem value={"Female"}>Female</MenuItem>
-          <MenuItem value={"Male"}>Male</MenuItem>
-          <MenuItem value={"Other"}>Other</MenuItem>
-        </TextField>
+          onChange={(value) => handleChange("gender", value)}
+          required
+          options={[
+            { label: "Female", value: "Female" },
+            { label: "Male", value: "Male" },
+            { label: "Other", value: "Other" },
+          ]}
+        />
 
-        <TextField
-          fullWidth
+        <FormInput
+          type="tel"
+          label="Mobile"
           name="phoneNo"
           value={formData.phoneNo}
-          type="tel"
-          onChange={handleChange}
+          onChange={(value) => handleChange("phoneNo", value)}
+          required
           placeholder="Search or type..."
-          variant="outlined"
-          size="small"
-          label={
-            <>
-              {" "}
-              Mobile <span style={{ color: "red" }}>*</span>
-            </>
-          }
-          // InputProps={{
-          //   startAdornment: (
-          //     <InputAdornment position="start">+91</InputAdornment>
-          //   ),
-          // }}
         />
 
-        <TextField
-          fullWidth
+        <FormInput
+          type="email"
+          label="Email"
           name="emailId"
           value={formData.emailId}
-          type="emailId"
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-          label={
-            <>
-              {" "}
-              Email <span style={{ color: "red" }}>*</span>
-            </>
-          }
+          onChange={(value) => handleChange("emailId", value)}
+          required
         />
 
-        <TextField
-          fullWidth
+        <FormInput
           label="Insurer Name"
           name="insurarName"
           value={formData.insurarName}
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
+          onChange={(value) => handleChange("insurarName", value)}
         />
 
-        <TextField
-          fullWidth
+        <FormInput
+          label="Notes"
           name="notes"
           value={formData.notes}
+          onChange={(value) => handleChange("notes", value)}
           multiline
-          // rows={3}
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-          label="Notes"
         />
 
-        <TextField
-          fullWidth
+        <FormInput
+          label="Additional Info"
           name="additionalInfo"
           value={formData.additionalInfo}
+          onChange={(value) => handleChange("additionalInfo", value)}
           multiline
-          // rows={3}
-          onChange={handleChange}
-          variant="outlined"
-          size="small"
-          label="Additional Info"
         />
       </Box>
+
       <Box display={"flex"} flexDirection={"column"}>
         <FormControlLabel
           control={
@@ -491,11 +434,10 @@ const AppointmentTabContent = ({ setEventData, selectedPatient }) => {
         />
         {showNotify && (
           <FormControl component="fieldset">
-            {/* <FormLabel component="legend">Notification Method</FormLabel> */}
             <RadioGroup
               name="notifyPatient"
               value={formData.notifyPatient}
-              onChange={(e) => handleChange(e, "checkbox")}
+              onChange={(value) => handleChange("notifyPatient", value)}
               row
             >
               <FormControlLabel value="sms" control={<Radio />} label="SMS" />
