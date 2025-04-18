@@ -1,84 +1,92 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FaCalendarCheck,
-  FaUserPlus,
-  FaFileInvoiceDollar,
-  FaProcedures,
-  FaBed,
-  FaUserMd,
-  FaFlask,
-  FaClipboardList,
-  FaFileAlt,
+  FaCalendarAlt,
+  FaNotesMedical,
   FaUserNurse,
+  FaUserMd,
+  FaCashRegister,
+  FaHospitalUser,
+  FaProcedures,
+  FaClinicMedical,
+  FaMicroscope,
+  FaChartBar,
+  FaCogs,
+  FaShieldAlt,
 } from "react-icons/fa";
 
 const allModules = [
   {
     name: "Appointment",
-    icon: <FaCalendarCheck />,
+    icon: <FaCalendarAlt />,
     path: "/secure/appointment",
-    color: "#6B8E23",
+    color: "#3B82F6",
   },
   {
     name: "Registration",
-    icon: <FaUserPlus />,
+    icon: <FaNotesMedical />,
     path: "/secure/registration",
-    color: "#FFA500",
-  },
-  {
-    name: "Doctor EMR",
-    icon: <FaUserMd />,
-    path: "/secure/doctorEmr",
-    color: "#9932CC",
+    color: "#10B981",
   },
   {
     name: "Nurse EMR",
     icon: <FaUserNurse />,
     path: "/secure/nurseEmr",
-    color: "#A52A2A",
+    color: "#EC4899",
+  },
+  {
+    name: "Doctor EMR",
+    icon: <FaUserMd />,
+    path: "/secure/doctorEmr",
+    color: "#8B5CF6",
   },
   {
     name: "Billing",
-    icon: <FaFileInvoiceDollar />,
+    icon: <FaCashRegister />,
     path: "/secure/billing/list",
-    color: "#008080",
-  },
-  {
-    name: "Report",
-    icon: <FaFileAlt />,
-    path: "/secure",
-    color: "#FF6B6B",
+    color: "#F59E0B",
   },
   {
     name: "IP EMR",
-    icon: <FaProcedures />,
+    icon: <FaHospitalUser />,
     path: "/secure/ipemr",
-    color: "#4169E1",
+    color: "#0EA5E9",
   },
   {
     name: "Bed & Ward",
-    icon: <FaBed />,
+    icon: <FaProcedures />,
     path: "/secure/bedandward",
-    color: "#A52A2A",
+    color: "#F43F5E",
   },
   {
     name: "OT Booking",
-    icon: <FaProcedures />,
+    icon: <FaClinicMedical />,
     path: "/secure/ot",
-    color: "#FF6B6B",
+    color: "#22D3EE",
   },
   {
     name: "Laboratory",
-    icon: <FaFlask />,
+    icon: <FaMicroscope />,
     path: "/secure/lab",
-    color: "#32CD32",
+    color: "#16A34A",
+  },
+  {
+    name: "Report",
+    icon: <FaChartBar />,
+    path: "/secure",
+    color: "#F97316",
   },
   {
     name: "Master",
-    icon: <FaClipboardList />,
+    icon: <FaCogs />,
     path: "/secure/master",
-    color: "#FF6B6B",
+    color: "#6366F1",
+  },
+  {
+    name: "Insurance",
+    icon: <FaShieldAlt />,
+    path: "/secure/insurance",
+    color: "#7C3AED",
   },
 ];
 
@@ -95,16 +103,14 @@ const Landing = () => {
       let allowedModules = [];
 
       if (userRole === "Receptionist") {
-        allowedModules = allModules.filter(
-          (mod) =>
-            mod.name === "Appointment" ||
-            mod.name === "Registration" ||
-            mod.name === "Billing" ||
-            mod.name === "Report"
+        allowedModules = allModules.filter((mod) =>
+          ["Appointment", "Registration", "Billing", "Report"].includes(
+            mod.name
+          )
         );
       } else if (userRole === "Billing") {
-        allowedModules = allModules.filter(
-          (mod) => mod.name === "Billing" || mod.name === "Report"
+        allowedModules = allModules.filter((mod) =>
+          ["Billing", "Report"].includes(mod.name)
         );
       } else if (userRole === "Doctor") {
         allowedModules = allModules.filter((mod) => mod.name === "Doctor EMR");
@@ -119,26 +125,24 @@ const Landing = () => {
   return (
     <div
       style={{
-        // minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f5f5f5",
-        padding: "20px",
+        minHeight: "100vh",
+        backgroundColor: "rgba(0, 0, 0, 0.05)",
+        padding: "30px",
+        boxSizing: "border-box",
+        overflow: "auto",
         width: "100%",
       }}
     >
+      {/* <h2 style={{ textAlign: "center", marginBottom: "30px" }}>
+        Hospital Dashboard
+      </h2> */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-          gap: "20px",
-          //   width: "100%",
-          maxWidth: "900px",
-          justifyContent: "center",
+          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+          gap: "24px",
+          width: "100%",
         }}
-        className="mx-auto"
       >
         {filteredModules.length > 0 ? (
           filteredModules.map((module, index) => (
@@ -146,37 +150,47 @@ const Landing = () => {
               key={index}
               onClick={() => navigate(module.path)}
               style={{
-                backgroundColor: module.color,
-                width: "150px",
-                height: "150px",
-                borderRadius: "10px",
+                backgroundColor: "rgb(217, 225 ,224)",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                transition: "transform 0.2s ease",
+                cursor: "pointer",
+                padding: "20px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                color: "white",
-                fontSize: "18px",
-                fontWeight: "bold",
                 textAlign: "center",
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
               }}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.transform = "scale(1.1)")
+                (e.currentTarget.style.transform = "translateY(-4px)")
               }
               onMouseLeave={(e) =>
-                (e.currentTarget.style.transform = "scale(1)")
+                (e.currentTarget.style.transform = "translateY(0)")
               }
             >
-              <div style={{ fontSize: "40px", marginBottom: "10px" }}>
+              <div
+                style={{
+                  backgroundColor: module.color,
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "28px",
+                  marginBottom: "12px",
+                }}
+              >
                 {module.icon}
               </div>
-              {module.name}
+              <div style={{ fontWeight: 600 }}>{module.name}</div>
             </div>
           ))
         ) : (
-          <p>No modules available for your role</p>
+          <p style={{ textAlign: "center", width: "100%" }}>
+            No modules available for your role
+          </p>
         )}
       </div>
     </div>
