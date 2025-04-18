@@ -9,26 +9,12 @@ const { Option } = Select;
 const PatientList = () => {
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.todayPatientList);
-  const [filter, setFilter] = useState({});
-  const [statusFilter, setStatusFilter] = useState("--All--");
-
-  console.log("data", data);
-
-  const handleFilterChange = (columnId, value, type) => {
-    if (type === "select") {
-      setStatusFilter(value);
-    }
-    setFilter({ ...filter, [columnId]: value });
-  };
-
-  const handleDateChange = (columnId, date) => {
-    let value = date ? moment(date).format("YYYY-MM-DD") : "";
-    setFilter({ ...filter, [columnId]: value });
-  };
-
+  
   useEffect(() => {
     dispatch(patientList());
-  }, []);
+  }, [dispatch]);
+
+
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
 
   const columns = [
@@ -137,12 +123,6 @@ const PatientList = () => {
       ),
       onFilter: (value, record) => record.status === value,
     },
-    // {
-    //   title: "Options",
-    //   dataIndex: "actions",
-    //   key: "actions",
-    //   render: (_, record) => <a href="#">Edit</a>,
-    // },
   ];
 
   return (

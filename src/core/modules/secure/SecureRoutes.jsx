@@ -223,7 +223,7 @@ export const SECURE_ROUTES = [
     component: Privileges,
   },
   {
-    path: `/secure/insurance`,
+    path: "/secure/insurance",
     exact: true,
     secure: true,
     component: Insurance,

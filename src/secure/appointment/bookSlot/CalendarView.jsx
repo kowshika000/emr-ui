@@ -245,7 +245,7 @@ const CalendarView = ({
 
   return (
     <Box width="100%" overflow="auto">
-      <EMRLoader show={loading} />
+      {/* <EMRLoader show={loading} /> */}
       <EventDisplayComponent
         slotDuration={slotDuration}
         setEvents={setEvents}
